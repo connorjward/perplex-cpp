@@ -1,0 +1,8 @@
+build/
+
+
+# temporary files
+*.swp
+
+# misc
+.tags

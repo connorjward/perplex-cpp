@@ -1,12 +1,17 @@
-add_library(perplex SHARED
-	    state.cc utils.cc c_interface.f)
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffixed-line-length-132")
 
-target_include_directories(perplex 
-			   PUBLIC ${PROJECT_SOURCE_DIR}/include
-			   PRIVATE ${perplex-extern_SOURCE_DIR})
+add_library(
+  perplex 
+  SHARED
+  c_interface.f
+  state.cc 
+  utils.cc 
+)
 
-target_link_libraries(perplex PRIVATE perplex-extern)
+target_include_directories(
+  perplex 
+  PUBLIC ${PROJECT_SOURCE_DIR}/include
+  PRIVATE ${perplex-orig_SOURCE_DIR}
+)
 
-target_compile_options(perplex
-		       PRIVATE 
-		       -ffixed-line-length-132) # increase line length
+target_link_libraries(perplex PRIVATE perplex-orig)
