@@ -4,8 +4,8 @@ add_library(
   perplex 
   SHARED
   c_interface.f
-  state.cc 
   utils.cc 
+  wrapper.cc 
 )
 
 target_include_directories(

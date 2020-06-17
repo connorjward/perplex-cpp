@@ -11,7 +11,7 @@ if(NOT googletest_POPULATED)
   add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
 endif()
 
-add_executable(testperplex c_interface.cc state.cc)
+add_executable(testperplex c_interface.cc wrapper.cc)
 
 target_include_directories(testperplex PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
@@ -20,12 +20,12 @@ target_link_libraries(testperplex perplex gtest gtest_main)
 # copy test files to build directory
 file(
   COPY ${PROJECT_SOURCE_DIR}/data/test/simple
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/test
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/simple
 )
 
 include(GoogleTest)
 gtest_discover_tests(
   testperplex
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/test/simple
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/simple
 )
 

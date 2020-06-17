@@ -1,6 +1,3 @@
-#include <cassert>
-
-#include <perplex/state.h>
 #include <perplex/utils.h>
 
 namespace perplex
