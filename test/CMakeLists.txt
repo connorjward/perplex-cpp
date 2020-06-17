@@ -1,14 +1,31 @@
-add_executable(perplex-test 
-               c_interface.cc state.cc)
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        release-1.8.0
+)
 
-target_include_directories(perplex-test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+FetchContent_GetProperties(googletest)
+if(NOT googletest_POPULATED)
+  FetchContent_Populate(googletest)
+  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
+endif()
 
-target_link_libraries(perplex-test perplex gtest gtest_main)
+add_executable(testperplex c_interface.cc state.cc)
 
-gtest_discover_tests(perplex-test
-		     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test-simple)
+target_include_directories(testperplex PRIVATE ${PROJECT_SOURCE_DIR}/src)
+
+target_link_libraries(testperplex perplex gtest gtest_main)
 
 # copy test files to build directory
-file(COPY ${CMAKE_SOURCE_DIR}/data/perplex-dat-files/test-simple
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-     FILES_MATCHING PATTERN *.dat)
+file(
+  COPY ${PROJECT_SOURCE_DIR}/data/test/simple
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/test
+)
+
+include(GoogleTest)
+gtest_discover_tests(
+  testperplex
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/test/simple
+)
+
