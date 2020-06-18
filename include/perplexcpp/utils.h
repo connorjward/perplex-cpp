@@ -17,18 +17,25 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <perplexcpp/utils.h>
+#ifndef PERPLEXCPP_UTILS_H
+#define PERPLEXCPP_UTILS_H
 
 namespace perplexcpp
 {
   namespace utils
   {
-    double convert_pascals_to_bar(const double pressure_in_pascals) {
-      return pressure_in_pascals / 1e6;
-    }
+    /**
+     * @param pressure_in_pascals
+     * @return                    The pressure in bar.
+     */
+    double convert_pascals_to_bar(const double pressure_in_pascals);
 
-    double convert_bar_to_pascals(const double pressure_in_bar) {
-      return pressure_in_bar * 1e6;
-    }
+    /**
+     * @param pressure_in_bar
+     * @return                The pressure in pascals.
+     */
+    double convert_bar_to_pascals(const double pressure_in_bar);
   }
 }
+
+#endif

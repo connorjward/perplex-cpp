@@ -1,41 +1,68 @@
+/*
+ * Copyright (C) 2020 Connor Ward.
+ *
+ * This file is part of PerpleX-cpp.
+ *
+ * PerpleX-cpp is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PerpleX-cpp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include <cassert>
 #include <fcntl.h>
 #include <stdexcept>
 #include <unistd.h>
 
-#include <perplex/wrapper.h>
-#include <perplex/utils.h>
+#include <perplexcpp/wrapper.h>
+#include <perplexcpp/utils.h>
 
 #include "c_interface.h"
 
 namespace
 {
-  const int disable_stdout() {
-    // flush stdout
-    fflush(stdout);
+  /**
+   * @return The file descriptor pointing to stdout.
+   */
+  const int disable_stdout() 
+  {
+    // Flush stdout.
+    fflush(stdout); 
 
-    // get file descriptors
+    // Get file descriptors.
     const int stdout_descriptor = dup(1);
     const int null_descriptor = open("/dev/null", O_WRONLY);
 
-    // reassign stdout to /dev/null
+    // Reassign stdout to /dev/null.
     dup2(null_descriptor, 1);
     close(null_descriptor);
 
     return stdout_descriptor;
   }
 
-  void enable_stdout(const int stdout_descriptor) {
-    // flush stdout
+  /**
+   * @param stdout_descriptor The file descriptor pointing to stdout.
+   */
+  void enable_stdout(const int stdout_descriptor) 
+  {
+    // Flush stdout.
     fflush(stdout);
 
-    // reassign descriptor
+    // Reassign descriptor.
     dup2(stdout_descriptor, 1);
     close(stdout_descriptor);
   }
 }
 
-namespace perplex
+namespace perplexcpp
 {
   Wrapper& Wrapper::get_instance()
   {
@@ -45,12 +72,18 @@ namespace perplex
 
   void Wrapper::initialize(const std::string& filename)
   {
-    // disable stdout to prevent Perple_X dominating stdout
-    /* const int fd = disable_stdout(); */
-    solver_init(filename.c_str());
-    /* enable_stdout(fd); */
+#ifndef ALLOW_PERPLEX_OUTPUT
+    // Disable stdout to prevent Perple_X dominating stdout.
+    const int fd = disable_stdout();
+#endif
 
-    // save that initialization is complete
+    solver_init(filename.c_str());
+
+#ifndef ALLOW_PERPLEX_OUTPUT
+    enable_stdout(fd);
+#endif
+
+    // Save that initialization is complete.
     initialized = true;
   }
 
@@ -59,13 +92,18 @@ namespace perplex
     solver_set_pressure(utils::convert_pascals_to_bar(pressure));
     solver_set_temperature(temperature);
 
-    // TODO fix this bug
-    // disable stdout to prevent Perple_X dominating stdout
-    /* const int fd = disable_stdout(); */
-    solver_minimize();
-    /* enable_stdout(fd); */
+#ifndef ALLOW_PERPLEX_OUTPUT
+    // Disable stdout to prevent Perple_X dominating stdout.
+    const int fd = disable_stdout();
+#endif
 
-    // save that the minimization is complete
+    solver_minimize();
+
+#ifndef ALLOW_PERPLEX_OUTPUT
+    enable_stdout(fd);
+#endif
+
+    // Save that the minimization is complete.
     minimized = true;
   }
 
@@ -79,9 +117,10 @@ namespace perplex
   {
     static std::vector<std::string> names;
 
-    names.resize(get_n_composition_components());
-    for (size_t i = 0; i < names.size(); ++i)
-      names[i] = std::string{composition_props_get_name(i)};
+    names.clear();
+
+    for (size_t i = 0; i < get_n_composition_components(); ++i)
+      names.push_back(std::string(composition_props_get_name(i)));
     return names;
   }
 
@@ -89,9 +128,10 @@ namespace perplex
   {
     static std::vector<double> composition;
     
-    composition.resize(get_n_composition_components());
-    for (size_t i = 0; i < composition.size(); ++i)
-      composition[i] = bulk_props_get_composition(i);
+    composition.clear();
+
+    for (size_t i = 0; i < get_n_composition_components(); ++i)
+      composition.push_back(bulk_props_get_composition(i));
     return composition;
   }
 
@@ -100,7 +140,7 @@ namespace perplex
     if (composition.size() != get_n_composition_components())
       throw std::invalid_argument("Specified bulk composition is the wrong size.");
 
-    for (size_t i = 0; i < composition.size(); ++i)
+    for (size_t i = 0; i < get_n_composition_components(); ++i)
       bulk_props_set_composition(i, composition[i]);
   }
 
@@ -114,9 +154,10 @@ namespace perplex
   {
     static std::vector<std::string> names;
 
-    names.resize(get_n_phases());
-    for (size_t i = 0; i < names.size(); ++i)
-      names[i] = std::string(soln_phase_props_get_abbr_name(i));
+    names.clear();
+
+    for (size_t i = 0; i < get_n_phases(); ++i)
+      names.push_back(std::string(soln_phase_props_get_abbr_name(i)));
     return names;
   }
 
@@ -126,8 +167,9 @@ namespace perplex
     static std::vector<std::string> names;
 
     names.clear();
+
     for (size_t i = 0; i < get_n_phases(); ++i)
-      names.push_back(std::string{soln_phase_props_get_full_name(i)});
+      names.push_back(std::string(soln_phase_props_get_full_name(i)));
     return names;
   }
 
@@ -168,21 +210,24 @@ namespace perplex
   {
     static std::vector<std::vector<double>> compositions;
 
-    compositions.resize(get_n_phases());
+    compositions.clear();
 
     std::unordered_map<size_t,size_t> idx_map = get_phase_index_mapping();
-    for (size_t i = 0; i < compositions.size(); ++i) {
-      std::vector<double> composition = compositions[i];
-      composition.resize(get_n_composition_components());
 
-      bool found = idx_map.find(i) != idx_map.end();
+    for (size_t i = 0; i < get_n_phases(); ++i) {
+      std::vector<double> composition;
 
-      for (size_t j = 0; j < composition.size(); ++j) {
-	if (found)
-	  composition[j] = res_phase_props_get_composition(idx_map[i], j);
-	else
-	  composition[j] = 0.0;
+      // Check to see if the solution phase is present in the end phases.
+      // If it is, load the composition. If not, set it to be zeros.
+      if (idx_map.find(i) != idx_map.end()) {
+	for (size_t j = 0; j < get_n_composition_components(); ++j)
+	  composition.push_back(res_phase_props_get_composition(idx_map[i], j));
+      } else {
+	for (size_t j = 0; j < get_n_composition_components(); ++j)
+	  composition.push_back(0.0);
       }
+
+      compositions.push_back(composition);
     }
     return compositions;
   }
@@ -219,37 +264,45 @@ namespace perplex
       throw std::logic_error("minimize() has not been called yet.");
   }
 
-  void Wrapper::load_phase_quantity(double (*get_quantity)(size_t), 
-                                  std::vector<double>& out) const
+  size_t Wrapper::get_n_end_phases() const
   {
-    out.resize(get_n_phases());
+    return res_phase_props_get_n();
+  }
 
-    std::unordered_map<size_t,size_t> idx_map = get_phase_index_mapping();
-    for (size_t i = 0; i < out.size(); ++i) {
-      auto search = idx_map.find(i);
-      if (search != idx_map.end())
-	out[i] = get_quantity(idx_map[i]);
+  void Wrapper::load_phase_quantity(double (*get_quantity)(size_t), 
+                                    std::vector<double>& out) const
+  {
+    out.clear();
+
+    auto idx_map = get_phase_index_mapping();
+
+    for (size_t i = 0; i < get_n_phases(); ++i) {
+      // Check to see if the solution phase is present in the end phases.
+      // If it is, load the quantity. If not, set it to be zeros.
+      if (idx_map.find(i) != idx_map.end())
+	out.push_back(get_quantity(idx_map[i]));
       else
-	out[i] = 0.0;
+	out.push_back(0.0);
     }
   }
 
   const std::unordered_map<size_t,size_t>& Wrapper::get_phase_index_mapping() const
   {
-    static std::unordered_map<size_t,size_t> index_map;
+    static std::unordered_map<size_t,size_t> idx_map;
 
-    index_map.clear();
+    idx_map.clear();
+
     for (size_t i = 0; i < get_n_end_phases(); ++i) {
-      std::string end_phase_name = res_phase_props_get_name(i);
-      index_map.emplace(find_phase_index_from_name(end_phase_name), i);
+      std::string phase_name = res_phase_props_get_name(i);
+      idx_map.emplace(find_phase_index_from_name(phase_name), i);
     }
-    return index_map;
+    return idx_map;
   }
 
   size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
   {
-    std::vector<std::string> abbr_names = get_abbr_phase_names();
-    std::vector<std::string> full_names = get_full_phase_names();
+    auto abbr_names = get_abbr_phase_names();
+    auto full_names = get_full_phase_names();
     
     assert(abbr_names.size() == get_n_phases());
     assert(full_names.size() == get_n_phases());
@@ -259,10 +312,5 @@ namespace perplex
 	return i;
     }
     throw std::invalid_argument("The phase name was not found.");
-  }
-
-  size_t Wrapper::get_n_end_phases() const
-  {
-    return res_phase_props_get_n();
   }
 }

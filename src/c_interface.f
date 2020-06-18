@@ -1,3 +1,20 @@
+! Copyright (C) 2020 Connor Ward.
+!
+! This file is part of PerpleX-cpp.
+!
+! PerpleX-cpp is free software: you can redistribute it and/or modify
+! it under the terms of the GNU General Public License as published by
+! the Free Software Foundation, either version 3 of the License, or
+! (at your option) any later version.
+!
+! PerpleX-cpp is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+! GNU General Public License for more details.
+!
+! You should have received a copy of the GNU General Public License
+! along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
+
       module mod_meemum_c_interface
 
         use, intrinsic :: iso_c_binding
@@ -82,7 +99,7 @@
         subroutine solver_set_pressure(pressure) bind(c)
           real(c_double), intent(in), value :: pressure
 
-          ! source: ?
+          ! source: resub.f
           double precision v, tr, pr, r, ps
           common / cst5  / v(l2), tr, pr, r, ps
 
@@ -92,7 +109,7 @@
         subroutine solver_set_temperature(temperature) bind(c)
           real(c_double), intent(in), value :: temperature
 
-          ! source: ?
+          ! source: resub.f
           double precision v, tr, pr, r, ps
           common / cst5  / v(l2), tr, pr, r, ps
 
@@ -150,7 +167,7 @@
         function soln_phase_props_get_n() bind(c) result(res)
           integer(c_size_t) :: res
 
-          ! source: ???
+          ! source: perplex_parameters.h
           integer isoct
           common / cst79 / isoct
 
@@ -162,7 +179,7 @@
           integer(c_size_t), intent(in), value :: soln_phase_idx
           type(c_ptr) :: res
 
-          ! source: ???
+          ! source: rlib.f
           character fname*10, aname*6, lname*22
           common / csta7 / fname(h9), aname(h9), lname(h9)
 
@@ -174,7 +191,7 @@
           integer(c_size_t), intent(in), value :: soln_phase_idx
           type(c_ptr) :: res
 
-          ! source: ???
+          ! source: rlib.f
           character fname*10, aname*6, lname*22
           common / csta7 / fname(h9), aname(h9), lname(h9)
 
@@ -188,7 +205,7 @@
         function res_phase_props_get_n() bind(c) result(res)
           integer(c_size_t) :: res
 
-          ! source: ???
+          ! source: resub.f
           integer kkp, np, ncpd, ntot
           double precision cp3, amt
           common / cxt15 / cp3(k0,k19), amt(k19), kkp(k19), 
@@ -202,7 +219,7 @@
           integer(c_size_t), intent(in), value :: res_phase_idx
           type(c_ptr) :: res
 
-          ! source: ???
+          ! source: olib.f
           character pname*14
           common / cxt21a / pname(k5)
 
@@ -359,13 +376,13 @@
 
           character(c_char), dimension(:), pointer :: c_str
 
-          ! allocate memory for C string
+          ! Allocate memory for C string.
           allocate(c_str(len_trim(f_str)+1))
 
-          ! copy across Fortran string
+          ! Copy across Fortran string.
           c_str = transfer(trim(f_str) // c_null_char, c_str)
 
-          ! return pointer to C string
+          ! Return pointer to C string.
           ptr = c_loc(c_str)
         end function
       end module

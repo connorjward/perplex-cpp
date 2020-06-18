@@ -1,27 +1,49 @@
-#pragma once
+/*
+ * Copyright (C) 2020 Connor Ward.
+ *
+ * This file is part of PerpleX-cpp.
+ *
+ * PerpleX-cpp is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PerpleX-cpp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#ifndef PERPLEXCPP_WRAPPER_H
+#define PERPLEXCPP_WRAPPER_H
 
 #include <cstddef>
-
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-namespace perplex
+namespace perplexcpp
 {
+  /**
+   * A class that controls the access to the underlying Perple_X calculations
+   * and results. It utilises the singleton design pattern (only a single
+   * instance is ever created) because Perple_X relies heavily on global 
+   * variables (COMMON blocks) so care must be taken to avoid concurrent access 
+   * to the resources.
+   */
   class Wrapper
   {
     public:
       /**
-       * Retrieve singleton instance of state. A singleton is used because
-       * Perple_X relies heavily on global variables (COMMON blocks) so care
-       * must be taken to avoid concurrent access to the resources.
-       *
-       * @return The singleton instance of the state.
+       * @return The singleton instance of the wrapper.
        */
       static Wrapper& get_instance();
 
       /**
-       * Initialize Perple_X
+       * Initialize Perple_X.
        *
        * @param filename The Perple_X problem definition file.
        */
@@ -117,12 +139,12 @@ namespace perplex
 
     private:
       /**
-       * A boolean indicating whether Perple_X has been initialized or not.
+       * A boolean indicating whether initialize() has been called.
        */
       bool initialized = false;
 
       /**
-       * A boolean indicating whether minimize() has been called or not.
+       * A boolean indicating whether minimize() has been called.
        */
       bool minimized = false;
 
@@ -134,34 +156,49 @@ namespace perplex
       Wrapper() {};
 
       /**
-       *
+       * Check if initialize() has been called and throw an exception if not.
        */
       void check_initialized() const;
 
       /**
-       *
+       * Check if minimize() has been called and throw an exception if not.
        */
       void check_minimized() const;
 
       /**
+       * @return The number of end phases.
        *
+       * @remark This method is necessary because Perple_X differentiates between
+       *         solution and end phases so the number of the latter can change.
+       */
+      size_t get_n_end_phases() const;
+
+      /**
+       * Read some phase quantity into an array.
+       *
+       * @param get_quantity A function pointer to the Perple_X interface function.
+       * @param out          The output array that results are read into.
        */
       void load_phase_quantity(double (*get_quantity)(size_t),
 	                       std::vector<double>& out) const;
 
       /**
+       * @return A map where the keys are the solution phase indices and
+       *         the values are the corresponding end phase indices.
+       *
+       * @remark This is necessary because Perple_X differentiates between the
+       *         end phases and solution phases and their indexing is different.
        *
        */
       const std::unordered_map<size_t,size_t>& get_phase_index_mapping() const;
 
       /**
-       * TODO
+       * Find the solution phase index for a given end phase name.
+       *
+       * @param name The name of the end phase.
        */
       size_t find_phase_index_from_name(const std::string& name) const;
-
-      /**
-       *
-       */
-      size_t get_n_end_phases() const;
   };
 }
+
+#endif

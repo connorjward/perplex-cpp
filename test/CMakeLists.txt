@@ -1,31 +1,18 @@
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        release-1.8.0
-)
+include(GoogleTest)
 
-FetchContent_GetProperties(googletest)
-if(NOT googletest_POPULATED)
-  FetchContent_Populate(googletest)
-  add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-endif()
+add_executable(testperplexcpp c_interface.cc wrapper.cc)
 
-add_executable(testperplex c_interface.cc wrapper.cc)
+target_include_directories(testperplexcpp PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
-target_include_directories(testperplex PRIVATE ${PROJECT_SOURCE_DIR}/src)
-
-target_link_libraries(testperplex perplex gtest gtest_main)
+target_link_libraries(testperplexcpp perplexcpp
+                      gtest gtest_main)
 
 # copy test files to build directory
 file(
   COPY ${PROJECT_SOURCE_DIR}/data/test/simple
-  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/simple
+  DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data
 )
 
-include(GoogleTest)
-gtest_discover_tests(
-  testperplex
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/simple
-)
+gtest_discover_tests(testperplexcpp
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/simple)
 
