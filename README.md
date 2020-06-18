@@ -1,4 +1,4 @@
-# perplex-cpp
+# PerpleX-cpp
 
 This repository contains a C++ wrapper for the thermodynamic code [Perple_X](perplex.ethz.ch) (written in Fortran 77).
 
@@ -10,9 +10,7 @@ This repository contains a C++ wrapper for the thermodynamic code [Perple_X](per
 
 - A C++ 2011 compatible C++ compiler (e.g. `gcc`)
 
-- Git
-
-## Installation instructions
+## Build instructions
 
 An out of source build is recommended:
 
@@ -23,7 +21,8 @@ An out of source build is recommended:
 	
 ## Testing
 
-Testing is done using CTest.
+Unit testing is done using CMake and GoogleTest (installed as part of main build). 
+To run the tests just run `ctest` from the root build directory.
 
 ## Project layout
 

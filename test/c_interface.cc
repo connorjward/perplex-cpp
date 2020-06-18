@@ -1,14 +1,33 @@
-#include <gtest/gtest.h>
+/*
+ * Copyright (C) 2020 Connor Ward.
+ *
+ * This file is part of PerpleX-cpp.
+ *
+ * PerpleX-cpp is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PerpleX-cpp is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #include "c_interface.h"
+
+#include <gtest/gtest.h>
 
 class InterfaceTest : public ::testing::Test {
   protected:
     void SetUp() override {
-      const char *filename{"test1"};
-      const double pressure{20000};
-      const double temperature{1500};
-      const double composition[4]{38.500, 2.820, 50.500, 5.880};
+      const char *filename = "test";
+      const double pressure = 20000;
+      const double temperature = 1500;
+      const double composition[4] = { 38.500, 2.820, 50.500, 5.880 };
 
       solver_init(filename);
       solver_set_pressure(pressure);
