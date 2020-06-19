@@ -1,5 +1,5 @@
 add_library(
-  perplexcpp 
+  perplexcpp SHARED
 
   c_interface.f
   utils.cc 
