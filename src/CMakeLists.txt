@@ -34,7 +34,7 @@ message("${ALLOW_PERPLEX_OUTPUT}")
 
 if(ALLOW_PERPLEX_OUTPUT)
   message("in here")
-  target_compile_definitions(perplexcpp PRIVATE ALLOW_PERPLEX_OUTPUT)
+  target_compile_definitions(perplexcpp PUBLIC ALLOW_PERPLEX_OUTPUT)
 endif()
 
 # Add a prefix to the following conflicting function names:
