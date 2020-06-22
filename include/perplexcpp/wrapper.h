@@ -21,6 +21,7 @@
 #define PERPLEXCPP_WRAPPER_H
 
 #include <cstddef>
+#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -45,9 +46,12 @@ namespace perplexcpp
       /**
        * Initialize Perple_X.
        *
-       * @param filename The Perple_X problem definition file.
+       * @param problem_file The Perple_X problem definition file.
+       * @param working_dir  The directory containing the Perple_X files. If
+       *                     not provided defaults to the current directory.
        */
-      void initialize(const std::string& filename);
+      void initialize(const std::filesystem::path& problem_file, 
+	              const std::filesystem::path& working_dir=std::filesystem::current_path());
 
       /**
        * Perform the minimization using MEEMUM.

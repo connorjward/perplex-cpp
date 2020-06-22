@@ -37,3 +37,5 @@ endif()
 # - dgemv (conflicts with the BLAS implementation of dgemv)
 target_compile_definitions(perplexcpp
                            PRIVATE dgemv=perplexcpp_dgemv)
+
+target_link_libraries(perplexcpp PRIVATE stdc++fs)

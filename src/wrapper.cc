@@ -70,18 +70,31 @@ namespace perplexcpp
     return instance;
   }
 
-  void Wrapper::initialize(const std::string& filename)
+  void Wrapper::initialize(const std::filesystem::path& problem_file, 
+     	                   const std::filesystem::path& working_dir)
   {
+    // TODO Put these into their own functions and add error checking.
+
+    namespace fs = std::filesystem;
+
+    // Save the current working directory then change it to the location of the Perple_X files.
+    auto initial_dir = std::filesystem::current_path();
+    std::filesystem::current_path(working_dir);
+
 #ifndef ALLOW_PERPLEX_OUTPUT
     // Disable stdout to prevent Perple_X dominating stdout.
     const int fd = disable_stdout();
 #endif
 
-    solver_init(filename.c_str());
+    // Remove .dat extension
+    solver_init(problem_file.stem().c_str());
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     enable_stdout(fd);
 #endif
+
+    // Return to the original working directory.
+    std::filesystem::current_path(initial_dir);
 
     // Save that initialization is complete.
     initialized = true;
