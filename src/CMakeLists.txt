@@ -1,3 +1,5 @@
+option(ALLOW_PERPLEX_OUTPUT OFF)
+
 add_library(
   perplexcpp SHARED
 
@@ -19,6 +21,10 @@ target_include_directories(
   PUBLIC ${PROJECT_SOURCE_DIR}/include
   PRIVATE ${perplex_SOURCE_DIR}
 )
+
+if(ALLOW_PERPLEX_OUTPUT)
+  target_compile_definitions(perplexcpp PRIVATE ALLOW_PERPLEX_OUTPUT)
+endif()
 
 set(CMAKE_Fortran_FLAGS 
     "${CMAKE_Fortran_FLAGS} -ffixed-line-length-132")
