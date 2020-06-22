@@ -19,6 +19,8 @@
 
 #include "c_interface.h"
 
+#include <filesystem>
+
 #include <gtest/gtest.h>
 
 class InterfaceTest : public ::testing::Test {
@@ -28,6 +30,9 @@ class InterfaceTest : public ::testing::Test {
       const double pressure = 20000;
       const double temperature = 1500;
       const double composition[4] = { 38.500, 2.820, 50.500, 5.880 };
+
+      // Change working directory.
+      std::filesystem::current_path("./simple");
 
       solver_init(filename);
       solver_set_pressure(pressure);

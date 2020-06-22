@@ -27,7 +27,8 @@ using namespace perplexcpp;
 class WrapperSimpleDataTest : public ::testing::Test {
   protected:
     void SetUp() override {
-      const std::string filename = "test";
+      const std::string problem_file = "test.dat";
+      const std::string working_dir = "./simple";
       const double pressure = utils::convert_bar_to_pascals(20000);
       const double temperature = 1500;
       std::vector<double> composition;
@@ -38,7 +39,7 @@ class WrapperSimpleDataTest : public ::testing::Test {
 
       Wrapper wrap = Wrapper::get_instance();
 
-      wrap.initialize(filename);
+      wrap.initialize(problem_file, working_dir);
       wrap.set_bulk_composition(composition);
       wrap.minimize(pressure, temperature);
     }
