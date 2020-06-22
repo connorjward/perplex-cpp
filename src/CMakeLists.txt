@@ -1,5 +1,12 @@
 option(ALLOW_PERPLEX_OUTPUT OFF)
 
+# Set the Fortran compilation flags. '-cpp' is required to enable the 
+# preprocessor and '-ffixed-line-length-132' increases the maximum line
+# length for fixed-form Fortran code so adding any prefixes does not
+# break the code.
+set(CMAKE_Fortran_FLAGS 
+    "${CMAKE_Fortran_FLAGS} -cpp -ffixed-line-length-132")
+
 add_library(
   perplexcpp SHARED
 
@@ -26,5 +33,7 @@ if(ALLOW_PERPLEX_OUTPUT)
   target_compile_definitions(perplexcpp PRIVATE ALLOW_PERPLEX_OUTPUT)
 endif()
 
-set(CMAKE_Fortran_FLAGS 
-    "${CMAKE_Fortran_FLAGS} -ffixed-line-length-132")
+# Add a prefix to the following conflicting function names:
+# - dgemv (conflicts with the BLAS implementation of dgemv)
+target_compile_definitions(perplexcpp
+                           PRIVATE dgemv=perplexcpp_dgemv)
