@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <fcntl.h>
+#include <iostream>
 #include <stdexcept>
 #include <unistd.h>
 
@@ -307,7 +308,18 @@ namespace perplexcpp
 
     for (size_t i = 0; i < get_n_end_phases(); ++i) {
       std::string phase_name = res_phase_props_get_name(i);
-      idx_map.emplace(find_phase_index_from_name(phase_name), i);
+
+      // If the Perple_X models are poorly suited to the problem at hand they may
+      // sometimes return phases that are not among the solution models (e.g. faTL).
+      // These phases are often present in extremely small amounts and so can be
+      // disregarded. However, if you are seeing lots of error messages that implies
+      // that you need to edit your parameter files.
+      try {
+	idx_map.emplace(find_phase_index_from_name(phase_name), i);
+      } catch (const std::invalid_argument& e) {
+	std::cerr << e.what() << std::endl;
+	std::cerr << phase_name << " : " << res_phase_props_get_mol_frac(i) << std::endl;
+      }
     }
     return idx_map;
   }
