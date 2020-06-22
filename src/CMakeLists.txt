@@ -29,7 +29,11 @@ target_include_directories(
   PRIVATE ${perplex_SOURCE_DIR}
 )
 
+message("Allow PerpleX output:")
+message("${ALLOW_PERPLEX_OUTPUT}")
+
 if(ALLOW_PERPLEX_OUTPUT)
+  message("in here")
   target_compile_definitions(perplexcpp PRIVATE ALLOW_PERPLEX_OUTPUT)
 endif()
 
