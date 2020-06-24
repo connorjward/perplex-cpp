@@ -87,6 +87,11 @@ namespace perplexcpp
       size_t get_n_phases() const;
 
       /**
+       * @return The standard phase names.
+       */
+      const std::vector<std::string>& get_phase_names() const;
+
+      /**
        * @return The abbreviated phase names.
        */
       const std::vector<std::string>& get_abbr_phase_names() const;
@@ -120,6 +125,13 @@ namespace perplexcpp
        * @return The phase compositions.
        */
       const std::vector<std::vector<double>>& get_phase_compositions() const;
+
+      /**
+       * Find the phase index for a given phase name.
+       *
+       * @param name The phase name
+       */
+      size_t find_phase_index_from_name(const std::string& name) const;
 
       /**
        * @return The system density (kg/m3).
@@ -195,13 +207,6 @@ namespace perplexcpp
        *
        */
       const std::unordered_map<size_t,size_t>& get_phase_index_mapping() const;
-
-      /**
-       * Find the solution phase index for a given end phase name.
-       *
-       * @param name The name of the end phase.
-       */
-      size_t find_phase_index_from_name(const std::string& name) const;
   };
 }
 

@@ -164,6 +164,18 @@ namespace perplexcpp
   }
 
   const std::vector<std::string>& 
+  Wrapper::get_phase_names() const
+  {
+    static std::vector<std::string> names;
+
+    names.clear();
+
+    for (size_t i = 0; i < get_n_phases(); ++i)
+      names.push_back(std::string(soln_phase_props_get_name(i)));
+    return names;
+  }
+
+  const std::vector<std::string>& 
   Wrapper::get_abbr_phase_names() const
   {
     static std::vector<std::string> names;
@@ -246,6 +258,26 @@ namespace perplexcpp
     return compositions;
   }
 
+  size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
+  {
+    auto standard_names = get_phase_names();
+    auto abbr_names = get_abbr_phase_names();
+    auto full_names = get_full_phase_names();
+    
+    assert(standard_names.size() == get_n_phases());
+    assert(abbr_names.size() == get_n_phases());
+    assert(full_names.size() == get_n_phases());
+
+    for (size_t i = 0; i < get_n_phases(); ++i) {
+      if (phase_name == standard_names[i] ||
+	  phase_name == abbr_names[i] || 
+	  phase_name == full_names[i]) {
+	return i;
+      }
+    }
+    throw std::invalid_argument("The phase name was not found.");
+  }
+
   double Wrapper::get_system_density() const
   {
     return sys_props_get_density();
@@ -322,20 +354,5 @@ namespace perplexcpp
       }
     }
     return idx_map;
-  }
-
-  size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
-  {
-    auto abbr_names = get_abbr_phase_names();
-    auto full_names = get_full_phase_names();
-    
-    assert(abbr_names.size() == get_n_phases());
-    assert(full_names.size() == get_n_phases());
-
-    for (size_t i = 0; i < get_n_phases(); ++i) {
-      if (phase_name == abbr_names[i] || phase_name == full_names[i])
-	return i;
-    }
-    throw std::invalid_argument("The phase name was not found.");
   }
 }

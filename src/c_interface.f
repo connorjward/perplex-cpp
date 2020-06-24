@@ -174,6 +174,18 @@
           res = isoct
         end function
 
+        function soln_phase_props_get_name(soln_phase_idx) bind(c)
+     >      result(res)
+          integer(c_size_t), intent(in), value :: soln_phase_idx
+          type(c_ptr) :: res
+
+          ! source: rlib.f
+          character fname*10, aname*6, lname*22
+          common / csta7 / fname(h9), aname(h9), lname(h9)
+
+          res = alloc_c_str(fname(soln_phase_idx+1))
+        end function
+
         function soln_phase_props_get_abbr_name(soln_phase_idx) bind(c)
      >      result(res)
           integer(c_size_t), intent(in), value :: soln_phase_idx
@@ -195,7 +207,7 @@
           character fname*10, aname*6, lname*22
           common / csta7 / fname(h9), aname(h9), lname(h9)
 
-          res = alloc_c_str(fname(soln_phase_idx+1))
+          res = alloc_c_str(lname(soln_phase_idx+1))
         end function
 
         ! ----------------------------------------------------------

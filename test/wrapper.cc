@@ -75,6 +75,16 @@ TEST_F(WrapperSimpleDataTest, CheckNPhases)
   EXPECT_EQ(Wrapper::get_instance().get_n_phases(), 4);
 }
 
+TEST_F(WrapperSimpleDataTest, CheckPhaseNames)
+{
+  auto names = Wrapper::get_instance().get_phase_names();
+
+  EXPECT_STREQ(names[0].c_str(), "Cpx(HGP)");
+  EXPECT_STREQ(names[1].c_str(), "melt(HGP)");
+  EXPECT_STREQ(names[2].c_str(), "O(HGP)");
+  EXPECT_STREQ(names[3].c_str(), "Opx(HGP)");
+}
+
 TEST_F(WrapperSimpleDataTest, CheckAbbrPhaseNames)
 {
   auto names = Wrapper::get_instance().get_abbr_phase_names();
@@ -89,10 +99,10 @@ TEST_F(WrapperSimpleDataTest, CheckFullPhaseNames)
 {
   auto names = Wrapper::get_instance().get_full_phase_names();
 
-  EXPECT_STREQ(names[0].c_str(), "Cpx(HGP)");
-  EXPECT_STREQ(names[1].c_str(), "melt(HGP)");
-  EXPECT_STREQ(names[2].c_str(), "O(HGP)");
-  EXPECT_STREQ(names[3].c_str(), "Opx(HGP)");
+  EXPECT_STREQ(names[0].c_str(), "clinopyroxene");
+  EXPECT_STREQ(names[1].c_str(), "liquid");
+  EXPECT_STREQ(names[2].c_str(), "olivine");
+  EXPECT_STREQ(names[3].c_str(), "orthopyroxene");
 }
 
 TEST_F(WrapperSimpleDataTest, CheckPhaseWeightFracs)

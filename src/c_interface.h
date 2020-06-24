@@ -91,16 +91,22 @@ extern "C"
   size_t soln_phase_props_get_n();
 
   /**
-   * @param soln_phase_idx Solution phase index.
-   * @return	       The abbreviated name of the solution phase.
+   * @param idx Solution phase index.
+   * @return	The standard name of the solution phase.
    */
-  char* soln_phase_props_get_abbr_name(size_t soln_phase_idx);
+  char* soln_phase_props_get_name(size_t idx);
 
   /**
-   * @param soln_phase_idx Solution phase index.
-   * @return	       The full name of the solution phase.
+   * @param idx Solution phase index.
+   * @return	The abbreviated name of the solution phase.
    */
-  char* soln_phase_props_get_full_name(size_t soln_phase_idx);
+  char* soln_phase_props_get_abbr_name(size_t idx);
+
+  /**
+   * @param idx Solution phase index.
+   * @return	The full name of the solution phase.
+   */
+  char* soln_phase_props_get_full_name(size_t idx);
 
   /* ----------------------------------------------------------- */
   /* ----------------- RESULT PHASE PROPERTIES ----------------- */

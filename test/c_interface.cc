@@ -60,9 +60,8 @@ TEST_F(InterfaceTest, CheckBulkProps) {
 TEST_F(InterfaceTest, CheckSolnPhaseProps) {
   EXPECT_EQ(soln_phase_props_get_n(), 4);
 
+  EXPECT_STREQ(soln_phase_props_get_name(3), "Opx(HGP)");
   EXPECT_STREQ(soln_phase_props_get_abbr_name(2), "Ol");
-
-  EXPECT_STREQ(soln_phase_props_get_full_name(3), "Opx(HGP)");
 }
 
 TEST_F(InterfaceTest, CheckResPhaseProps) {
