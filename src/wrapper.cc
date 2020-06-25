@@ -71,31 +71,36 @@ namespace perplexcpp
     return instance;
   }
 
-  void Wrapper::initialize(const std::filesystem::path& problem_file, 
-     	                   const std::filesystem::path& working_dir)
+  void Wrapper::initialize(const std::string& problem_file, 
+     	                   const std::string& working_dir)
   {
-    // TODO Put these into their own functions and add error checking.
-
-    namespace fs = std::filesystem;
-
     // Save the current working directory then change it to the location of the Perple_X files.
-    auto initial_dir = std::filesystem::current_path();
-    std::filesystem::current_path(working_dir);
+    char initial_dir[256];
+    if (getcwd(initial_dir, sizeof(initial_dir)) == NULL)
+      throw std::runtime_error("Could not get the current directory.");
+    
+    if (chdir(working_dir.c_str()) != 0)
+      throw std::invalid_argument("Could not change directory.");
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     // Disable stdout to prevent Perple_X dominating stdout.
     const int fd = disable_stdout();
 #endif
 
-    // Remove .dat extension
-    solver_init(problem_file.stem().c_str());
+    // Check that the problem file ends in '.dat' and then strip it before passing it
+    // to Perple_X.
+    size_t extension = problem_file.rfind(".");
+    if (problem_file.substr(extension) != ".dat")
+      throw std::invalid_argument("Problem file given does not end in '.dat'.");
+    solver_init(problem_file.substr(0, extension).c_str());
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     enable_stdout(fd);
 #endif
 
     // Return to the original working directory.
-    std::filesystem::current_path(initial_dir);
+    if (chdir(initial_dir) != 0)
+      throw std::invalid_argument("Could not change directory.");
 
     // Save that initialization is complete.
     initialized = true;

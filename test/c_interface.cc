@@ -19,8 +19,6 @@
 
 #include "c_interface.h"
 
-#include <filesystem>
-
 #include <gtest/gtest.h>
 
 class InterfaceTest : public ::testing::Test {
@@ -32,7 +30,8 @@ class InterfaceTest : public ::testing::Test {
       const double composition[4] = { 38.500, 2.820, 50.500, 5.880 };
 
       // Change working directory.
-      std::filesystem::current_path("./simple");
+      if (chdir("./simple") != 0)
+	throw std::invalid_argument("Could not change directory.");
 
       solver_init(filename);
       solver_set_pressure(pressure);

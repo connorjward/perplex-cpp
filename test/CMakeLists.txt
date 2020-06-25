@@ -14,4 +14,4 @@ file(
 )
 
 gtest_discover_tests(testperplexcpp
-                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/test)

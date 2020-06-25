@@ -5,7 +5,7 @@ option(ALLOW_PERPLEX_OUTPUT OFF)
 # length for fixed-form Fortran code so adding any prefixes does not
 # break the code.
 set(CMAKE_Fortran_FLAGS 
-    "${CMAKE_Fortran_FLAGS} -cpp -ffixed-line-length-132")
+    "${CMAKE_Fortran_FLAGS} -cpp -ffixed-line-length-132 -std=legacy")
 
 add_library(
   perplexcpp SHARED
@@ -37,5 +37,3 @@ endif()
 # - dgemv (conflicts with the BLAS implementation of dgemv)
 target_compile_definitions(perplexcpp
                            PRIVATE dgemv=perplexcpp_dgemv)
-
-target_link_libraries(perplexcpp PRIVATE stdc++fs)
