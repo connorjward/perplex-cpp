@@ -143,6 +143,14 @@ namespace perplexcpp
     return names;
   }
 
+  double Wrapper::get_n_moles() const
+  {
+    double n_moles = 0.0;
+    for (double composition_component : get_bulk_composition())
+      n_moles += composition_component;
+    return n_moles;
+  }
+
   const std::vector<double>& Wrapper::get_bulk_composition() const
   {
     static std::vector<double> composition;

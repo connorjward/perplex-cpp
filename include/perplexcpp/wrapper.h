@@ -71,6 +71,11 @@ namespace perplexcpp
       const std::vector<std::string>& get_composition_component_names() const;
 
       /**
+       * @return The total number of moles of substance.
+       */
+      double get_n_moles() const;
+
+      /**
        * @return The bulk composition.
        */
       const std::vector<double>& get_bulk_composition() const;
