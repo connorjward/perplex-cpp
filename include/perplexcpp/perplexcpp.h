@@ -96,7 +96,7 @@ namespace perplexcpp
     /**
      * The phase composition.
      */
-    std::vector<double> composition;
+    std::vector<CompositionComponent> composition;
   };
 
 

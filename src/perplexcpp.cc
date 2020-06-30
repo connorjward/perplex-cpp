@@ -148,18 +148,25 @@ namespace perplexcpp
     /**
      * @return The composition of a phase.
      */
-    std::vector<double> phase_composition(const size_t phase_index)
+    std::vector<CompositionComponent> phase_composition(const size_t phase_index)
     {
-      std::vector<double> composition;
+      std::vector<CompositionComponent> composition;
 
       // Check to see if the solution phase is present in the end phases.
       // If it is, return the quantity. If not, return zero.
       auto map = phase_index_mapping();
       if (map.find(phase_index) != map.end())
 	for (size_t i = 0; i < n_composition_components(); ++i)
-	  composition.push_back(res_phase_props_get_composition(map[phase_index], i));
+	  composition.push_back({
+	    composition_component_names()[i],  // name
+	    res_phase_props_get_composition(map[phase_index], i) // amount
+	  });
       else
-	composition.push_back(0.0);
+	for (size_t i = 0; i < n_composition_components(); ++i)
+	  composition.push_back({
+	    composition_component_names()[i],  // name
+	    0.0 // amount
+	  });
       return composition;
     }
 
