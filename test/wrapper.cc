@@ -37,21 +37,21 @@ class WrapperSimpleDataTest : public ::testing::Test {
       composition.push_back(50.500); 
       composition.push_back(5.880);
 
+      Wrapper::initialize(problem_file, working_dir);
       Wrapper wrap = Wrapper::get_instance();
 
-      wrap.initialize(problem_file, working_dir);
       wrap.minimize(pressure, temperature, composition);
     }
 };
 
 TEST_F(WrapperSimpleDataTest, CheckNCompositionComponents)
 {
-  EXPECT_EQ(Wrapper::get_instance().get_n_composition_components(), 4);
+  EXPECT_EQ(Wrapper::get_instance().n_composition_components, 4);
 }
 
 TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
 {
-  auto names = Wrapper::get_instance().get_composition_component_names();
+  auto names = Wrapper::get_instance().composition_component_names;
 
   EXPECT_STREQ(names[0].c_str(), "SiO2");
   EXPECT_STREQ(names[1].c_str(), "CaO");

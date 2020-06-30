@@ -37,10 +37,6 @@ namespace perplexcpp
   class Wrapper
   {
     public:
-      /**
-       * @return The singleton instance of the wrapper.
-       */
-      static Wrapper& get_instance();
 
       /**
        * Initialize Perple_X.
@@ -49,8 +45,33 @@ namespace perplexcpp
        * @param working_dir  The directory containing the Perple_X files. If
        *                     not provided defaults to the current directory.
        */
-      void initialize(const std::string& problem_file, 
-	              const std::string& working_dir=".");
+      static void initialize(const std::string& problem_file, 
+	                     const std::string& working_dir=".");
+
+
+      /**
+       * @return The singleton instance of the wrapper.
+       */
+      static Wrapper& get_instance();
+
+
+      /**
+       * The number of composition components.
+       */
+      const size_t n_composition_components;
+
+
+      /**
+       * The names of the composition components.
+       */
+      const std::vector<std::string> composition_component_names;
+
+
+      /**
+       * The initial bulk composition.
+       */
+      const std::vector<double> initial_composition;
+
 
       /**
        * Perform the minimization using MEEMUM. The composition in use is the
@@ -66,6 +87,7 @@ namespace perplexcpp
 	            const double temperature,
 		    const std::vector<double>& composition);
 
+
       /**
        * Perform the minimization using MEEMUM. The composition in use is the
        * initial composition specified in the Perple_X problem definition file.
@@ -74,16 +96,6 @@ namespace perplexcpp
        * @param temperature The temperature (K).
        */
       void minimize(const double pressure, const double temperature);
-
-      /**
-       * @return The number of composition components.
-       */
-      size_t get_n_composition_components() const;
-
-      /**
-       * @return The composition component names.
-       */
-      const std::vector<std::string>& get_composition_component_names() const;
 
       /**
        * @return The total number of moles of substance.
@@ -163,37 +175,44 @@ namespace perplexcpp
       double get_system_molar_heat_capacity() const;
 
     private:
+
       /**
-       * A boolean indicating whether initialize() has been called.
+       * Flag indicating whether or not the wrapper has been initialized.
        */
-      bool initialized = false;
+      static bool initialized;
+
+
+      /**
+       * @return The composition component names.
+       */
+      static std::vector<std::string> load_composition_component_names();
+
+
+      /**
+       * @return The bulk composition.
+       */
+      static std::vector<double> load_bulk_composition();
+
 
       /**
        * A boolean indicating whether minimize() has been called.
        */
       bool minimized = false;
 
-      /**
-       * The initial bulk composition specified in the file.
-       */
-      std::vector<double> initial_bulk_composition;
 
       /**
        * Construct the class.
        *
        * @remark This constructor is private to enforce the singleton pattern.
        */
-      Wrapper() {};
+      Wrapper();
 
-      /**
-       * Check if initialize() has been called and throw an exception if not.
-       */
-      void check_initialized() const;
 
       /**
        * Check if minimize() has been called and throw an exception if not.
        */
       void check_minimized() const;
+
 
       /**
        * @return The number of end phases.
@@ -203,6 +222,7 @@ namespace perplexcpp
        */
       size_t get_n_end_phases() const;
 
+
       /**
        * Read some phase quantity into an array.
        *
@@ -211,6 +231,7 @@ namespace perplexcpp
        */
       void load_phase_quantity(double (*get_quantity)(size_t),
 	                       std::vector<double>& out) const;
+
 
       /**
        * @return A map where the keys are the solution phase indices and

@@ -65,20 +65,15 @@ namespace
 
 namespace perplexcpp
 {
-  Wrapper& Wrapper::get_instance()
-  {
-    static Wrapper instance;
-    return instance;
-  }
-
   void Wrapper::initialize(const std::string& problem_file, 
-     	                   const std::string& working_dir)
+			   const std::string& working_dir)
   {
-    // Save the current working directory then change it to the location of the Perple_X files.
+    // Save the current working directory.
     char initial_dir[256];
     if (getcwd(initial_dir, sizeof(initial_dir)) == NULL)
       throw std::runtime_error("Could not get the current directory.");
-    
+
+    // Change working directory to the location of the Perple_X files.
     if (chdir(working_dir.c_str()) != 0)
       throw std::invalid_argument("Could not change directory.");
 
@@ -89,10 +84,10 @@ namespace perplexcpp
 
     // Check that the problem file ends in '.dat' and then strip it before passing it
     // to Perple_X.
-    size_t extension = problem_file.rfind(".");
-    if (problem_file.substr(extension) != ".dat")
+    size_t suffix = problem_file.rfind(".");
+    if (problem_file.substr(suffix) != ".dat")
       throw std::invalid_argument("Problem file given does not end in '.dat'.");
-    solver_init(problem_file.substr(0, extension).c_str());
+    solver_init(problem_file.substr(0, suffix).c_str());
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     enable_stdout(fd);
@@ -104,20 +99,27 @@ namespace perplexcpp
 
     // Save that initialization is complete.
     initialized = true;
-
-    // Save the initial bulk composition.
-    for (size_t i = 0; i < get_n_composition_components(); ++i)
-      initial_bulk_composition.push_back(bulk_props_get_composition(i));
   }
+
+
+  Wrapper& Wrapper::get_instance()
+  {
+    if (!initialized)
+      throw std::logic_error("Perple_X has not been initialized.");
+
+    static Wrapper instance;
+    return instance;
+  }
+
 
   void Wrapper::minimize(const double pressure, 
                          const double temperature,
 			 const std::vector<double>& composition)
   {
-    if (composition.size() != get_n_composition_components())
+    if (composition.size() != n_composition_components)
       throw std::invalid_argument("Specified bulk composition is the wrong size.");
 
-    for (size_t i = 0; i < get_n_composition_components(); ++i)
+    for (size_t i = 0; i < n_composition_components; ++i)
       bulk_props_set_composition(i, composition[i]);
 
     solver_set_pressure(utils::convert_pascals_to_bar(pressure));
@@ -138,40 +140,27 @@ namespace perplexcpp
     minimized = true;
   }
 
+
   void Wrapper::minimize(const double pressure, const double temperature)
   {
-    minimize(pressure, temperature, initial_bulk_composition);
+    minimize(pressure, temperature, initial_composition);
   }
 
-  size_t Wrapper::get_n_composition_components() const
-  {
-    return composition_props_get_n_components();
-  }
-
-  const std::vector<std::string>& 
-  Wrapper::get_composition_component_names() const
-  {
-    static std::vector<std::string> names;
-
-    names.clear();
-
-    for (size_t i = 0; i < get_n_composition_components(); ++i)
-      names.push_back(std::string(composition_props_get_name(i)));
-    return names;
-  }
 
   double Wrapper::get_n_moles() const
   {
     double n_moles = 0.0;
-    for (double composition_component : initial_bulk_composition)
+    for (double composition_component : initial_composition)
       n_moles += composition_component;
     return n_moles;
   }
+
 
   size_t Wrapper::get_n_phases() const
   {
     return soln_phase_props_get_n();
   }
+
 
   const std::vector<std::string>& 
   Wrapper::get_phase_names() const
@@ -185,6 +174,7 @@ namespace perplexcpp
     return names;
   }
 
+
   const std::vector<std::string>& 
   Wrapper::get_abbr_phase_names() const
   {
@@ -196,6 +186,7 @@ namespace perplexcpp
       names.push_back(std::string(soln_phase_props_get_abbr_name(i)));
     return names;
   }
+
 
   const std::vector<std::string>& 
   Wrapper::get_full_phase_names() const
@@ -209,6 +200,7 @@ namespace perplexcpp
     return names;
   }
 
+
   const std::vector<double>& Wrapper::get_phase_weight_fracs() const
   {
     static std::vector<double> fracs;
@@ -217,6 +209,7 @@ namespace perplexcpp
     return fracs;
   }
 
+
   const std::vector<double>& Wrapper::get_phase_vol_fracs() const
   {
     static std::vector<double> fracs;
@@ -224,6 +217,7 @@ namespace perplexcpp
     load_phase_quantity(res_phase_props_get_vol_frac, fracs);
     return fracs;
   }
+
 
   const std::vector<double>& Wrapper::get_phase_mol_fracs() const
   {
@@ -256,10 +250,10 @@ namespace perplexcpp
       // Check to see if the solution phase is present in the end phases.
       // If it is, load the composition. If not, set it to be zeros.
       if (idx_map.find(i) != idx_map.end()) {
-	for (size_t j = 0; j < get_n_composition_components(); ++j)
+	for (size_t j = 0; j < n_composition_components; ++j)
 	  composition.push_back(res_phase_props_get_composition(idx_map[i], j));
       } else {
-	for (size_t j = 0; j < get_n_composition_components(); ++j)
+	for (size_t j = 0; j < n_composition_components; ++j)
 	  composition.push_back(0.0);
       }
 
@@ -303,16 +297,40 @@ namespace perplexcpp
     return sys_props_get_mol_entropy();
   }
   
+
   double Wrapper::get_system_molar_heat_capacity() const
   {
     return sys_props_get_mol_heat_capacity();
   }
 
-  void Wrapper::check_initialized() const
+
+  bool Wrapper::initialized = false;
+
+
+  std::vector<std::string> Wrapper::load_composition_component_names()
   {
-    if (!initialized)
-      throw std::logic_error("initialize() has not been called yet.");
+    std::vector<std::string> names;
+    for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+      names.push_back(std::string(composition_props_get_name(i)));
+    return names;
   }
+
+
+  std::vector<double> Wrapper::load_bulk_composition()
+  {
+    std::vector<double> bulk;
+    for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+      bulk.push_back(bulk_props_get_composition(i));
+    return bulk;
+  }
+
+
+  Wrapper::Wrapper() 
+  : n_composition_components(composition_props_get_n_components()),
+    composition_component_names(Wrapper::load_composition_component_names()),
+    initial_composition(Wrapper::load_bulk_composition())
+  {}
+
 
   void Wrapper::check_minimized() const
   {
@@ -320,10 +338,12 @@ namespace perplexcpp
       throw std::logic_error("minimize() has not been called yet.");
   }
 
+
   size_t Wrapper::get_n_end_phases() const
   {
     return res_phase_props_get_n();
   }
+
 
   void Wrapper::load_phase_quantity(double (*get_quantity)(size_t), 
                                     std::vector<double>& out) const
@@ -341,6 +361,7 @@ namespace perplexcpp
 	out.push_back(0.0);
     }
   }
+
 
   const std::unordered_map<size_t,size_t>& Wrapper::get_phase_index_mapping() const
   {
