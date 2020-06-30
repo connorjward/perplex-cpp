@@ -30,11 +30,28 @@ namespace perplexcpp
      */
     double convert_pascals_to_bar(const double pressure_in_pascals);
 
+
     /**
      * @param pressure_in_bar
      * @return                The pressure in pascals.
      */
     double convert_bar_to_pascals(const double pressure_in_bar);
+
+
+    /**
+     * Disable console output.
+     *
+     * @return The file descriptor pointing to stdout.
+     */
+    const int disable_stdout();
+
+
+    /**
+     * Enable console output.
+     *
+     * @param stdout_descriptor The file descriptor pointing to stdout.
+     */
+    void enable_stdout(const int stdout_descriptor) ;
   }
 }
 

@@ -17,55 +17,171 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <perplexcpp/wrapper.h>
+
 #include <cassert>
-#include <fcntl.h>
 #include <iostream>
 #include <stdexcept>
 #include <unistd.h>
 
-#include <perplexcpp/wrapper.h>
 #include <perplexcpp/utils.h>
 
 #include "c_interface.h"
 
-namespace
-{
-  /**
-   * @return The file descriptor pointing to stdout.
-   */
-  const int disable_stdout() 
-  {
-    // Flush stdout.
-    fflush(stdout); 
-
-    // Get file descriptors.
-    const int stdout_descriptor = dup(1);
-    const int null_descriptor = open("/dev/null", O_WRONLY);
-
-    // Reassign stdout to /dev/null.
-    dup2(null_descriptor, 1);
-    close(null_descriptor);
-
-    return stdout_descriptor;
-  }
-
-  /**
-   * @param stdout_descriptor The file descriptor pointing to stdout.
-   */
-  void enable_stdout(const int stdout_descriptor) 
-  {
-    // Flush stdout.
-    fflush(stdout);
-
-    // Reassign descriptor.
-    dup2(stdout_descriptor, 1);
-    close(stdout_descriptor);
-  }
-}
 
 namespace perplexcpp
 {
-  void Wrapper::initialize(const std::string& problem_file, 
+  namespace
+  {
+    /**
+     * Flag indicating whether or not Perple_X has been initialized.
+     */
+    bool initialized_ = false;
+
+
+    /**
+     * A boolean indicating whether minimize() has been called.
+     */
+    bool minimized_ = false;
+
+
+    std::vector<double> initial_composition_;
+
+    /**
+     * @return The number of end phases.
+     *
+     * @remark This method is necessary because Perple_X differentiates between
+     *         solution and end phases so the number of the latter can change.
+     */
+    size_t get_n_end_phases()
+    {
+      return res_phase_props_get_n();
+    }
+
+    /**
+     * @return A map where the keys are the solution phase indices and
+     *         the values are the corresponding end phase indices.
+     *
+     * @remark This is necessary because Perple_X differentiates between the
+     *         end phases and solution phases and their indexing is different.
+     *
+     */
+    const std::unordered_map<size_t,size_t>& phase_index_mapping()
+    {
+      static std::unordered_map<size_t,size_t> idx_map;
+
+      idx_map.clear();
+
+      for (size_t i = 0; i < get_n_end_phases(); ++i) {
+	std::string phase_name = res_phase_props_get_name(i);
+
+	// If the Perple_X models are poorly suited to the problem at hand they may
+	// sometimes return phases that are not among the solution models (e.g. faTL).
+	// These phases are often present in extremely small amounts and so can be
+	// disregarded. However, if you are seeing lots of error messages that implies
+	// that you need to edit your parameter files.
+	try {
+	  idx_map.emplace(find_phase_index_from_name(phase_name), i);
+	} catch (const std::invalid_argument& e) {
+	  std::cerr << e.what() << std::endl;
+	  std::cerr << phase_name << " : " << res_phase_props_get_mol_frac(i) << std::endl;
+	}
+      }
+      return idx_map;
+    }
+    /**
+     * Read some phase quantity into an array.
+     *
+     * @param get_quantity A function pointer to the Perple_X interface function.
+     * @param out          The output array that results are read into.
+     */
+    double find_phase_quantity(const size_t phase_index,
+			       double (*quantity)(size_t))
+    {
+      // Check to see if the solution phase is present in the end phases.
+      // If it is, return the quantity. If not, return zero.
+      auto map = phase_index_mapping();
+      if (map.find(phase_index) != map.end())
+	return quantity(map[phase_index]);
+      else
+	return 0.0;
+    }
+
+
+    /**
+     * doc
+     */
+    double phase_weight_frac(const size_t phase_index)
+    {
+      return find_phase_quantity(phase_index, res_phase_props_get_weight_frac);
+    }
+
+
+    /**
+     * doc
+     */
+    double phase_vol_frac(const size_t phase_index)
+    {
+      return find_phase_quantity(phase_index, res_phase_props_get_vol_frac);
+    }
+
+
+    /**
+     * doc
+     */
+    double phase_mol_frac(const size_t phase_index)
+    {
+      return find_phase_quantity(phase_index, res_phase_props_get_mol_frac);
+    }
+
+
+    /**
+     * doc
+     */
+    double phase_amount(const size_t phase_index)
+    {
+      return find_phase_quantity(phase_index, res_phase_props_get_mol);
+    }
+
+
+    /**
+     * @return The composition of a phase.
+     */
+    std::vector<double> phase_composition(const size_t phase_index)
+    {
+      std::vector<double> composition;
+
+      // Check to see if the solution phase is present in the end phases.
+      // If it is, return the quantity. If not, return zero.
+      auto map = phase_index_mapping();
+      if (map.find(phase_index) != map.end())
+	for (size_t i = 0; i < n_composition_components(); ++i)
+	  composition.push_back(res_phase_props_get_composition(map[phase_index], i));
+      else
+	composition.push_back(0.0);
+      return composition;
+    }
+
+    void check_initialized()
+    {
+      if (!initialized_)
+	throw std::logic_error("Perple_X has not been initialized.");
+    }
+
+    /**
+     * Check if minimize() has been called and throw an exception if not.
+     */
+    void check_minimized()
+    {
+      if (!minimized_)
+	throw std::logic_error("minimize() has not been called yet.");
+    }
+
+
+  }
+
+
+  void initialize(const std::string& problem_file, 
 			   const std::string& working_dir)
   {
     // Save the current working directory.
@@ -79,7 +195,7 @@ namespace perplexcpp
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     // Disable stdout to prevent Perple_X dominating stdout.
-    const int fd = disable_stdout();
+    const int fd = utils::disable_stdout();
 #endif
 
     // Check that the problem file ends in '.dat' and then strip it before passing it
@@ -90,36 +206,32 @@ namespace perplexcpp
     solver_init(problem_file.substr(0, suffix).c_str());
 
 #ifndef ALLOW_PERPLEX_OUTPUT
-    enable_stdout(fd);
+    utils::enable_stdout(fd);
 #endif
 
     // Return to the original working directory.
     if (chdir(initial_dir) != 0)
       throw std::invalid_argument("Could not change directory.");
 
+    // Save the initial composition.
+    for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+      initial_composition_.push_back(bulk_props_get_composition(i));
+
     // Save that initialization is complete.
-    initialized = true;
+    initialized_ = true;
   }
 
 
-  Wrapper& Wrapper::get_instance()
-  {
-    if (!initialized)
-      throw std::logic_error("Perple_X has not been initialized.");
-
-    static Wrapper instance;
-    return instance;
-  }
-
-
-  void Wrapper::minimize(const double pressure, 
+  void minimize(const double pressure, 
                          const double temperature,
 			 const std::vector<double>& composition)
   {
-    if (composition.size() != n_composition_components)
+    check_initialized();
+
+    if (composition.size() != n_composition_components())
       throw std::invalid_argument("Specified bulk composition is the wrong size.");
 
-    for (size_t i = 0; i < n_composition_components; ++i)
+    for (size_t i = 0; i < n_composition_components(); ++i)
       bulk_props_set_composition(i, composition[i]);
 
     solver_set_pressure(utils::convert_pascals_to_bar(pressure));
@@ -127,187 +239,34 @@ namespace perplexcpp
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     // Disable stdout to prevent Perple_X dominating stdout.
-    const int fd = disable_stdout();
+    const int fd = utils::disable_stdout();
 #endif
 
     solver_minimize();
 
 #ifndef ALLOW_PERPLEX_OUTPUT
-    enable_stdout(fd);
+    utils::enable_stdout(fd);
 #endif
 
     // Save that the minimization is complete.
-    minimized = true;
+    minimized_ = true;
   }
 
 
-  void Wrapper::minimize(const double pressure, const double temperature)
+  void minimize(const double pressure, const double temperature)
   {
-    minimize(pressure, temperature, initial_composition);
+    check_initialized();
+
+    minimize(pressure, temperature, initial_composition_);
   }
 
-
-  double Wrapper::get_n_moles() const
+  size_t n_composition_components()
   {
-    double n_moles = 0.0;
-    for (double composition_component : initial_composition)
-      n_moles += composition_component;
-    return n_moles;
+    return composition_props_get_n_components();
   }
 
 
-  size_t Wrapper::get_n_phases() const
-  {
-    return soln_phase_props_get_n();
-  }
-
-
-  const std::vector<std::string>& 
-  Wrapper::get_phase_names() const
-  {
-    static std::vector<std::string> names;
-
-    names.clear();
-
-    for (size_t i = 0; i < get_n_phases(); ++i)
-      names.push_back(std::string(soln_phase_props_get_name(i)));
-    return names;
-  }
-
-
-  const std::vector<std::string>& 
-  Wrapper::get_abbr_phase_names() const
-  {
-    static std::vector<std::string> names;
-
-    names.clear();
-
-    for (size_t i = 0; i < get_n_phases(); ++i)
-      names.push_back(std::string(soln_phase_props_get_abbr_name(i)));
-    return names;
-  }
-
-
-  const std::vector<std::string>& 
-  Wrapper::get_full_phase_names() const
-  {
-    static std::vector<std::string> names;
-
-    names.clear();
-
-    for (size_t i = 0; i < get_n_phases(); ++i)
-      names.push_back(std::string(soln_phase_props_get_full_name(i)));
-    return names;
-  }
-
-
-  const std::vector<double>& Wrapper::get_phase_weight_fracs() const
-  {
-    static std::vector<double> fracs;
-
-    load_phase_quantity(res_phase_props_get_weight_frac, fracs);
-    return fracs;
-  }
-
-
-  const std::vector<double>& Wrapper::get_phase_vol_fracs() const
-  {
-    static std::vector<double> fracs;
-
-    load_phase_quantity(res_phase_props_get_vol_frac, fracs);
-    return fracs;
-  }
-
-
-  const std::vector<double>& Wrapper::get_phase_mol_fracs() const
-  {
-    static std::vector<double> fracs;
-
-    load_phase_quantity(res_phase_props_get_mol_frac, fracs);
-    return fracs;
-  }
-
-  const std::vector<double>& Wrapper::get_phase_amounts() const
-  {
-    static std::vector<double> amounts;
-
-    load_phase_quantity(res_phase_props_get_mol, amounts);
-    return amounts;
-  }
-
-  const std::vector<std::vector<double>>&
-  Wrapper::get_phase_compositions() const
-  {
-    static std::vector<std::vector<double>> compositions;
-
-    compositions.clear();
-
-    std::unordered_map<size_t,size_t> idx_map = get_phase_index_mapping();
-
-    for (size_t i = 0; i < get_n_phases(); ++i) {
-      std::vector<double> composition;
-
-      // Check to see if the solution phase is present in the end phases.
-      // If it is, load the composition. If not, set it to be zeros.
-      if (idx_map.find(i) != idx_map.end()) {
-	for (size_t j = 0; j < n_composition_components; ++j)
-	  composition.push_back(res_phase_props_get_composition(idx_map[i], j));
-      } else {
-	for (size_t j = 0; j < n_composition_components; ++j)
-	  composition.push_back(0.0);
-      }
-
-      compositions.push_back(composition);
-    }
-    return compositions;
-  }
-
-  size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
-  {
-    auto standard_names = get_phase_names();
-    auto abbr_names = get_abbr_phase_names();
-    auto full_names = get_full_phase_names();
-    
-    assert(standard_names.size() == get_n_phases());
-    assert(abbr_names.size() == get_n_phases());
-    assert(full_names.size() == get_n_phases());
-
-    for (size_t i = 0; i < get_n_phases(); ++i) {
-      if (phase_name == standard_names[i] ||
-	  phase_name == abbr_names[i] || 
-	  phase_name == full_names[i]) {
-	return i;
-      }
-    }
-    throw std::invalid_argument("The phase name was not found.");
-  }
-
-  double Wrapper::get_system_density() const
-  {
-    return sys_props_get_density();
-  }
-
-  double Wrapper::get_system_expansivity() const
-  {
-    return sys_props_get_expansivity();
-  }
-
-  double Wrapper::get_system_molar_entropy() const
-  {
-    return sys_props_get_mol_entropy();
-  }
-  
-
-  double Wrapper::get_system_molar_heat_capacity() const
-  {
-    return sys_props_get_mol_heat_capacity();
-  }
-
-
-  bool Wrapper::initialized = false;
-
-
-  std::vector<std::string> Wrapper::load_composition_component_names()
+  std::vector<std::string> composition_component_names()
   {
     std::vector<std::string> names;
     for (size_t i = 0; i < composition_props_get_n_components(); ++i)
@@ -316,74 +275,81 @@ namespace perplexcpp
   }
 
 
-  std::vector<double> Wrapper::load_bulk_composition()
+  std::vector<double> initial_composition()
   {
-    std::vector<double> bulk;
-    for (size_t i = 0; i < composition_props_get_n_components(); ++i)
-      bulk.push_back(bulk_props_get_composition(i));
-    return bulk;
+    return initial_composition_;
   }
 
 
-  Wrapper::Wrapper() 
-  : n_composition_components(composition_props_get_n_components()),
-    composition_component_names(Wrapper::load_composition_component_names()),
-    initial_composition(Wrapper::load_bulk_composition())
-  {}
-
-
-  void Wrapper::check_minimized() const
+  size_t n_phases()
   {
-    if (!minimized)
-      throw std::logic_error("minimize() has not been called yet.");
+    return soln_phase_props_get_n();
+  }
+
+  double get_n_moles()
+  {
+    double n_moles = 0.0;
+    for (double composition_component : initial_composition_)
+      n_moles += composition_component;
+    return n_moles;
   }
 
 
-  size_t Wrapper::get_n_end_phases() const
+  std::vector<Phase> phases()
   {
-    return res_phase_props_get_n();
-  }
+    check_minimized();
 
+    std::vector<Phase> phases;
+    for (size_t i = 0; i < n_phases(); ++i) {
+      Phase phase {
+	soln_phase_props_get_name(i),       // standard_name
+	soln_phase_props_get_abbr_name(i),  // abbreviated_name
+	soln_phase_props_get_full_name(i),  // full_name
+	phase_weight_frac(i),               // weight_frac
+	phase_vol_frac(i),                  // vol_frac
+	phase_mol_frac(i),                  // mol_frac
+	phase_amount(i),                    // amount
+	phase_composition(i)                // composition
+      };
 
-  void Wrapper::load_phase_quantity(double (*get_quantity)(size_t), 
-                                    std::vector<double>& out) const
-  {
-    out.clear();
-
-    auto idx_map = get_phase_index_mapping();
-
-    for (size_t i = 0; i < get_n_phases(); ++i) {
-      // Check to see if the solution phase is present in the end phases.
-      // If it is, load the quantity. If not, set it to be zeros.
-      if (idx_map.find(i) != idx_map.end())
-	out.push_back(get_quantity(idx_map[i]));
-      else
-	out.push_back(0.0);
+      phases.push_back(phase);
     }
+    return phases;
   }
 
 
-  const std::unordered_map<size_t,size_t>& Wrapper::get_phase_index_mapping() const
+  size_t find_phase_index_from_name(const std::string& phase_name)
   {
-    static std::unordered_map<size_t,size_t> idx_map;
-
-    idx_map.clear();
-
-    for (size_t i = 0; i < get_n_end_phases(); ++i) {
-      std::string phase_name = res_phase_props_get_name(i);
-
-      // If the Perple_X models are poorly suited to the problem at hand they may
-      // sometimes return phases that are not among the solution models (e.g. faTL).
-      // These phases are often present in extremely small amounts and so can be
-      // disregarded. However, if you are seeing lots of error messages that implies
-      // that you need to edit your parameter files.
-      try {
-	idx_map.emplace(find_phase_index_from_name(phase_name), i);
-      } catch (const std::invalid_argument& e) {
-	std::cerr << e.what() << std::endl;
-	std::cerr << phase_name << " : " << res_phase_props_get_mol_frac(i) << std::endl;
-      }
+    for (size_t i = 0; i < n_phases(); ++i) {
+      if (phase_name == soln_phase_props_get_name(i) ||
+	  phase_name == soln_phase_props_get_abbr_name(i) || 
+	  phase_name == soln_phase_props_get_full_name(i))
+	return i;
     }
-    return idx_map;
+    throw std::invalid_argument("The phase name was not found.");
+  }
+
+
+  double get_system_density()
+  {
+    return sys_props_get_density();
+  }
+
+
+  double get_system_expansivity()
+  {
+    return sys_props_get_expansivity();
+  }
+
+
+  double get_system_molar_entropy()
+  {
+    return sys_props_get_mol_entropy();
+  }
+  
+
+  double get_system_molar_heat_capacity()
+  {
+    return sys_props_get_mol_heat_capacity();
   }
 }
