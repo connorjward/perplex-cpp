@@ -29,7 +29,25 @@
 namespace perplexcpp
 {
   /**
-   * A struct containg phase information.
+   * A struct representing a composition component.
+   */
+  struct CompositionComponent
+  {
+    /**
+     * The chemical name of the component.
+     */
+    std::string name;
+
+
+    /**
+     * The molar amount of the component.
+     */
+    double amount;
+  };
+
+
+  /**
+   * A struct containing phase information.
    */
   struct Phase
   {
@@ -79,6 +97,33 @@ namespace perplexcpp
      * The phase composition.
      */
     std::vector<double> composition;
+  };
+
+
+  /**
+   * A struct containing the system properties.
+   */
+  struct SystemProperties
+  {
+    /**
+     * The density (kg/m3).
+     */
+    double density;
+
+    /**
+     * The expansivity (1/K).
+     */
+    double expansivity;
+
+    /**
+     * The molar entropy (J/K).
+     */
+    double molar_entropy;
+
+    /**
+     * The molar heat capacity (J/K).
+     */
+    double molar_heat_capacity;
   };
 
 
@@ -149,8 +194,17 @@ namespace perplexcpp
 
   /**
    * @return The phase results of a minimization.
+   *
+   * @remark minimize() must be called beforehand.
    */
   std::vector<Phase> phases();
+
+  /**
+   * @return The system properties.
+   *
+   * @remark minimize() must be called beforehand.
+   */
+  SystemProperties system_props();
 
 
   /**
@@ -159,26 +213,6 @@ namespace perplexcpp
    * @param name The phase name
    */
   size_t find_phase_index_from_name(const std::string& name);
-
-  /**
-   * @return The system density (kg/m3).
-   */
-  double get_system_density();
-
-  /**
-   * @return The system expansivity (1/K).
-   */
-  double get_system_expansivity();
-
-  /**
-   * @return The system molar entropy (J/K).
-   */
-  double get_system_molar_entropy();
-
-  /**
-   * @return The system molar heat capacity (J/K).
-   */
-  double get_system_molar_heat_capacity();
 }
 
 #endif

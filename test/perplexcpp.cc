@@ -107,18 +107,11 @@ TEST_F(SimpleDataTest, CheckPhases)
   EXPECT_NEAR(phases[3].amount, 5.83, 5e-3);
 }
 
-TEST_F(SimpleDataTest, CheckSystemDensity) {
-  EXPECT_NEAR(get_system_density(), 3249.3, 0.05);
-}
+TEST_F(SimpleDataTest, CheckSystemProperties) {
+  SystemProperties props = system_props();
 
-TEST_F(SimpleDataTest, CheckSystemExpansivity) {
-  EXPECT_NEAR(get_system_expansivity(), 0.38575e-4, 5e-9);
+  EXPECT_NEAR(props.density, 3249.3, 0.05);
+  EXPECT_NEAR(props.expansivity, 0.38575e-4, 5e-9);
+  EXPECT_NEAR(props.molar_entropy, 11996, 0.5);
+  EXPECT_NEAR(props.molar_heat_capacity, 6244.7, 0.05);
 }
-
-TEST_F(SimpleDataTest, CheckSystemMolarEntropy) {
-  EXPECT_NEAR(get_system_molar_entropy(), 11996, 0.5);
-}
- 
-TEST_F(SimpleDataTest, CheckSystemMolarHeatCapacity) {
-  EXPECT_NEAR(get_system_molar_heat_capacity(), 6244.7, 0.05);
-} 
