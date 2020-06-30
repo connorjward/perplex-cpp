@@ -11,8 +11,8 @@ add_library(
   perplexcpp SHARED
 
   c_interface.f
+  perplexcpp.cc
   utils.cc 
-  wrapper.cc 
 
   ${perplex_SOURCE_DIR}/BLASlib.f
   ${perplex_SOURCE_DIR}/flib.f

@@ -17,12 +17,14 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <perplexcpp/wrapper.h>
+#include <perplexcpp/perplexcpp.h>
 
 #include <gtest/gtest.h>
 #include <perplexcpp/utils.h>
 
+
 using namespace perplexcpp;
+
 
 class SimpleDataTest : public ::testing::Test {
   protected:
@@ -45,10 +47,12 @@ class SimpleDataTest : public ::testing::Test {
     }
 };
 
+
 TEST_F(SimpleDataTest, CheckNCompositionComponents)
 {
   EXPECT_EQ(n_composition_components(), 4);
 }
+
 
 TEST_F(SimpleDataTest, CheckCompositionComponentNames)
 {
@@ -59,6 +63,7 @@ TEST_F(SimpleDataTest, CheckCompositionComponentNames)
   EXPECT_STREQ(names[2].c_str(), "MgO");
   EXPECT_STREQ(names[3].c_str(), "FeO");
 }
+
 
 TEST_F(SimpleDataTest, CheckNPhases) 
 {

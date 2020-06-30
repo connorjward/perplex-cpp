@@ -17,8 +17,8 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef PERPLEXCPP_WRAPPER_H
-#define PERPLEXCPP_WRAPPER_H
+#ifndef PERPLEXCPP_PERPLEXCPP_H
+#define PERPLEXCPP_PERPLEXCPP_H
 
 #include <cstddef>
 #include <string>

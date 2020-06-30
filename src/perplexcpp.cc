@@ -17,7 +17,8 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <perplexcpp/wrapper.h>
+
+#include <perplexcpp/perplexcpp.h>
 
 #include <cassert>
 #include <iostream>
