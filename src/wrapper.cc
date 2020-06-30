@@ -104,10 +104,22 @@ namespace perplexcpp
 
     // Save that initialization is complete.
     initialized = true;
+
+    // Save the initial bulk composition.
+    for (size_t i = 0; i < get_n_composition_components(); ++i)
+      initial_bulk_composition.push_back(bulk_props_get_composition(i));
   }
 
-  void Wrapper::minimize(const double pressure, const double temperature)
+  void Wrapper::minimize(const double pressure, 
+                         const double temperature,
+			 const std::vector<double>& composition)
   {
+    if (composition.size() != get_n_composition_components())
+      throw std::invalid_argument("Specified bulk composition is the wrong size.");
+
+    for (size_t i = 0; i < get_n_composition_components(); ++i)
+      bulk_props_set_composition(i, composition[i]);
+
     solver_set_pressure(utils::convert_pascals_to_bar(pressure));
     solver_set_temperature(temperature);
 
@@ -124,6 +136,11 @@ namespace perplexcpp
 
     // Save that the minimization is complete.
     minimized = true;
+  }
+
+  void Wrapper::minimize(const double pressure, const double temperature)
+  {
+    minimize(pressure, temperature, initial_bulk_composition);
   }
 
   size_t Wrapper::get_n_composition_components() const
@@ -146,29 +163,9 @@ namespace perplexcpp
   double Wrapper::get_n_moles() const
   {
     double n_moles = 0.0;
-    for (double composition_component : get_bulk_composition())
+    for (double composition_component : initial_bulk_composition)
       n_moles += composition_component;
     return n_moles;
-  }
-
-  const std::vector<double>& Wrapper::get_bulk_composition() const
-  {
-    static std::vector<double> composition;
-    
-    composition.clear();
-
-    for (size_t i = 0; i < get_n_composition_components(); ++i)
-      composition.push_back(bulk_props_get_composition(i));
-    return composition;
-  }
-
-  void Wrapper::set_bulk_composition(const std::vector<double>& composition)
-  {
-    if (composition.size() != get_n_composition_components())
-      throw std::invalid_argument("Specified bulk composition is the wrong size.");
-
-    for (size_t i = 0; i < get_n_composition_components(); ++i)
-      bulk_props_set_composition(i, composition[i]);
   }
 
   size_t Wrapper::get_n_phases() const

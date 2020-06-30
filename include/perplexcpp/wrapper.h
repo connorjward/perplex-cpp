@@ -53,7 +53,22 @@ namespace perplexcpp
 	              const std::string& working_dir=".");
 
       /**
-       * Perform the minimization using MEEMUM.
+       * Perform the minimization using MEEMUM. The composition in use is the
+       * initial composition specified in the Perple_X problem definition file.
+       *
+       * @param pressure    The pressure (Pa).
+       * @param temperature The temperature (K).
+       * @param composition The bulk composition. Each element in the vector 
+       *                    corresponds to the amount, in moles, of a
+       *                    composition component.
+       */
+      void minimize(const double pressure, 
+	            const double temperature,
+		    const std::vector<double>& composition);
+
+      /**
+       * Perform the minimization using MEEMUM. The composition in use is the
+       * initial composition specified in the Perple_X problem definition file.
        *
        * @param pressure    The pressure (Pa).
        * @param temperature The temperature (K).
@@ -74,16 +89,6 @@ namespace perplexcpp
        * @return The total number of moles of substance.
        */
       double get_n_moles() const;
-
-      /**
-       * @return The bulk composition.
-       */
-      const std::vector<double>& get_bulk_composition() const;
-
-      /**
-       * @param composition The new bulk composition.
-       */
-      void set_bulk_composition(const std::vector<double>& composition);
 
       /**
        * @return The number of phases.
@@ -167,6 +172,11 @@ namespace perplexcpp
        * A boolean indicating whether minimize() has been called.
        */
       bool minimized = false;
+
+      /**
+       * The initial bulk composition specified in the file.
+       */
+      std::vector<double> initial_bulk_composition;
 
       /**
        * Construct the class.

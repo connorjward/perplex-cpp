@@ -40,8 +40,7 @@ class WrapperSimpleDataTest : public ::testing::Test {
       Wrapper wrap = Wrapper::get_instance();
 
       wrap.initialize(problem_file, working_dir);
-      wrap.set_bulk_composition(composition);
-      wrap.minimize(pressure, temperature);
+      wrap.minimize(pressure, temperature, composition);
     }
 };
 
@@ -58,16 +57,6 @@ TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
   EXPECT_STREQ(names[1].c_str(), "CaO");
   EXPECT_STREQ(names[2].c_str(), "MgO");
   EXPECT_STREQ(names[3].c_str(), "FeO");
-}
-
-TEST_F(WrapperSimpleDataTest, CheckBulkComposition)
-{
-  auto composition = Wrapper::get_instance().get_bulk_composition();
-
-  EXPECT_NEAR(composition[0], 38.500, 5e-4);
-  EXPECT_NEAR(composition[1], 2.820, 5e-4);
-  EXPECT_NEAR(composition[2], 50.500, 5e-4);
-  EXPECT_NEAR(composition[3], 5.880, 5e-4);
 }
 
 TEST_F(WrapperSimpleDataTest, CheckNPhases) 
