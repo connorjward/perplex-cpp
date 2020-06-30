@@ -262,6 +262,18 @@ namespace perplexcpp
     return compositions;
   }
 
+  SystemProperties system_props()
+  {
+    check_minimized();
+
+    return SystemProperties {
+      sys_props_get_density(),           // density
+      sys_props_get_expansivity(),       // expansivity
+      sys_props_get_mol_entropy(),       // molar_entropy
+      sys_props_get_mol_heat_capacity()  // molar_heat_capacity
+    };
+  }
+
   size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
   {
     auto standard_names = get_phase_names();

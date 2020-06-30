@@ -28,6 +28,24 @@
 namespace perplexcpp
 {
   /**
+   * A struct representing a composition component.
+   */
+  struct CompositionComponent
+  {
+    /**
+     * The chemical name of the component.
+     */
+    std::string name;
+
+
+    /**
+     * The molar amount of the component.
+     */
+    double amount;
+  };
+
+
+  /**
    * A class that controls the access to the underlying Perple_X calculations
    * and results. It utilises the singleton design pattern (only a single
    * instance is ever created) because Perple_X relies heavily on global 
