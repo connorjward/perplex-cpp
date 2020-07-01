@@ -10,6 +10,7 @@ set(CMAKE_Fortran_FLAGS
 add_library(
   perplexcpp SHARED
 
+  base.cc
   c_interface.f
   utils.cc 
   wrapper.cc 

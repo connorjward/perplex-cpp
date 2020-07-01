@@ -18,37 +18,33 @@
  */
 
 
-#ifndef PERPLEXCPP_UTILS_H
-#define PERPLEXCPP_UTILS_H
+#include <perplexcpp/base.h>
+
+#include <stdexcept>
 
 
 namespace perplexcpp
 {
-  namespace utils
+  std::vector<CompositionComponent>
+  make_composition(std::vector<std::string> names,
+		   std::vector<double> amounts)
   {
+    if (names.size() != amounts.size())
+      throw std::invalid_argument("Vector sizes do not match.");
 
-    /**
-     * @param pressure_in_pascals
-     * @return                    The pressure in bar.
-     */
-    double convert_pascals_to_bar(const double pressure_in_pascals);
+    std::vector<CompositionComponent> comp;
+    for (size_t i = 0; i < names.size(); ++i)
+      comp.push_back({names[i], amounts[i]});
+    return comp;
+  }
 
-    /**
-     * @param pressure_in_bar
-     * @return                The pressure in pascals.
-     */
-    double convert_bar_to_pascals(const double pressure_in_bar);
 
-    /**
-     * @return The file descriptor pointing to stdout.
-     */
-    int disable_stdout();
-
-    /**
-     * @param stdout_descriptor The file descriptor pointing to stdout.
-     */
-    void enable_stdout(const int stdout_descriptor);
+  std::vector<CompositionComponent>
+  make_empty_composition(std::vector<std::string> names)
+  {
+    std::vector<CompositionComponent> comp;
+    for (size_t i = 0; i < names.size(); ++i)
+      comp.push_back({names[i], 0.0});
+    return comp;
   }
 }
-
-#endif

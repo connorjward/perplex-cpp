@@ -17,41 +17,51 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 #include <perplexcpp/wrapper.h>
 
 #include <gtest/gtest.h>
 #include <perplexcpp/utils.h>
 
+
 using namespace perplexcpp;
+
 
 class WrapperSimpleDataTest : public ::testing::Test {
   protected:
+
     void SetUp() override {
       const std::string problem_file = "test.dat";
       const std::string working_dir = "./simple";
-      const double pressure = utils::convert_bar_to_pascals(20000);
-      const double temperature = 1500;
-      std::vector<double> composition;
-      composition.push_back(38.500);
-      composition.push_back(2.820);
-      composition.push_back(50.500); 
-      composition.push_back(5.880);
 
       Wrapper::initialize(problem_file, working_dir);
-      Wrapper wrap = Wrapper::get_instance();
+      Wrapper& wrapper = Wrapper::get_instance();
 
-      wrap.minimize(pressure, temperature, composition);
+      const double pressure = utils::convert_bar_to_pascals(20000);
+      const double temperature = 1500;
+      auto composition = make_composition(wrapper.composition_component_names, 
+	                                  {38.500, 2.820, 50.500, 5.880});
+
+      result = wrapper.minimize(pressure, temperature, composition);
     }
+
+    
+    MinimizeResult result;
 };
+
+
 
 TEST_F(WrapperSimpleDataTest, CheckNCompositionComponents)
 {
   EXPECT_EQ(Wrapper::get_instance().n_composition_components, 4);
 }
 
+
 TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
 {
   auto names = Wrapper::get_instance().composition_component_names;
+
+  ASSERT_EQ(names.size(), 4);
 
   EXPECT_STREQ(names[0].c_str(), "SiO2");
   EXPECT_STREQ(names[1].c_str(), "CaO");
@@ -59,53 +69,166 @@ TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
   EXPECT_STREQ(names[3].c_str(), "FeO");
 }
 
-TEST_F(WrapperSimpleDataTest, CheckNPhases) 
+
+TEST_F(WrapperSimpleDataTest, CheckInitialComposition)
 {
-  EXPECT_EQ(n_phases(), 4);
+  auto comp = Wrapper::get_instance().initial_composition;
+
+  ASSERT_EQ(comp.size(), 4);
+
+  EXPECT_STREQ(comp[0].name.c_str(), "SiO2");
+  EXPECT_NEAR(comp[0].amount, 38.500, 5e-4);
+
+  EXPECT_STREQ(comp[1].name.c_str(), "CaO");
+  EXPECT_NEAR(comp[1].amount, 2.820, 5e-4);
+
+  EXPECT_STREQ(comp[2].name.c_str(), "MgO");
+  EXPECT_NEAR(comp[2].amount, 50.500, 5e-4);
+
+  EXPECT_STREQ(comp[3].name.c_str(), "FeO");
+  EXPECT_NEAR(comp[3].amount, 5.880, 5e-4);
 }
 
-TEST_F(SimpleDataTest, CheckPhases)
+
+TEST_F(WrapperSimpleDataTest, CheckNPhases) 
 {
-  std::vector<Phase> phases = perplexcpp::phases();
+  EXPECT_EQ(Wrapper::get_instance().n_phases, 4);
+}
 
-  EXPECT_STREQ(phases[0].standard_name.c_str(), "Cpx(HGP)");
-  EXPECT_STREQ(phases[0].abbreviated_name.c_str(), "Cpx");
-  EXPECT_STREQ(phases[0].full_name.c_str(), "clinopyroxene");
+
+TEST_F(WrapperSimpleDataTest, CheckPhaseNames)
+{
+  auto names = Wrapper::get_instance().phase_names;
+
+  ASSERT_EQ(names.size(), 4);
+
+  EXPECT_STREQ(names[0].standard.c_str(), "Cpx(HGP)");
+  EXPECT_STREQ(names[0].abbreviated.c_str(), "Cpx");
+  EXPECT_STREQ(names[0].full.c_str(), "clinopyroxene");
+
+  EXPECT_STREQ(names[1].standard.c_str(), "melt(HGP)");
+  EXPECT_STREQ(names[1].abbreviated.c_str(), "Melt");
+  EXPECT_STREQ(names[1].full.c_str(), "liquid");
+
+  EXPECT_STREQ(names[2].standard.c_str(), "O(HGP)");
+  EXPECT_STREQ(names[2].abbreviated.c_str(), "Ol");
+  EXPECT_STREQ(names[2].full.c_str(), "olivine");
+
+  EXPECT_STREQ(names[3].standard.c_str(), "Opx(HGP)");
+  EXPECT_STREQ(names[3].abbreviated.c_str(), "Opx");
+  EXPECT_STREQ(names[3].full.c_str(), "orthopyroxene");
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseNames)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_STREQ(phases[0].name.standard.c_str(), "Cpx(HGP)");
+  EXPECT_STREQ(phases[0].name.abbreviated.c_str(), "Cpx");
+  EXPECT_STREQ(phases[0].name.full.c_str(), "clinopyroxene");
+
+  EXPECT_STREQ(phases[1].name.standard.c_str(), "melt(HGP)");
+  EXPECT_STREQ(phases[1].name.abbreviated.c_str(), "Melt");
+  EXPECT_STREQ(phases[1].name.full.c_str(), "liquid");
+
+  EXPECT_STREQ(phases[2].name.standard.c_str(), "O(HGP)");
+  EXPECT_STREQ(phases[2].name.abbreviated.c_str(), "Ol");
+  EXPECT_STREQ(phases[2].name.full.c_str(), "olivine");
+
+  EXPECT_STREQ(phases[3].name.standard.c_str(), "Opx(HGP)");
+  EXPECT_STREQ(phases[3].name.abbreviated.c_str(), "Opx");
+  EXPECT_STREQ(phases[3].name.full.c_str(), "orthopyroxene");
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseWeightFractions)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
   EXPECT_NEAR(phases[0].weight_frac*100, 13.44, 5e-3);
-  EXPECT_NEAR(phases[0].vol_frac*100, 13.56, 5e-3);
-  EXPECT_NEAR(phases[0].mol_frac*100, 10.36, 5e-3);
-  EXPECT_NEAR(phases[0].amount, 3.07, 5e-3);
-
-  EXPECT_STREQ(phases[1].standard_name.c_str(), "melt(HGP)");
-  EXPECT_STREQ(phases[1].abbreviated_name.c_str(), "Melt");
-  EXPECT_STREQ(phases[1].full_name.c_str(), "liquid");
   EXPECT_NEAR(phases[1].weight_frac*100, 0.00, 5e-3);
-  EXPECT_NEAR(phases[1].vol_frac*100, 0.00, 5e-3);
-  EXPECT_NEAR(phases[1].mol_frac*100, 0.0, 5e-3);
-  EXPECT_NEAR(phases[1].amount, 0.0, 5e-3);
-
-  EXPECT_STREQ(phases[2].standard_name.c_str(), "O(HGP)");
-  EXPECT_STREQ(phases[2].abbreviated_name.c_str(), "Ol");
-  EXPECT_STREQ(phases[2].full_name.c_str(), "olivine");
   EXPECT_NEAR(phases[2].weight_frac*100, 62.02, 5e-3);
-  EXPECT_NEAR(phases[2].vol_frac*100, 61.68, 5e-3);
-  EXPECT_NEAR(phases[2].mol_frac*100, 69.931, 5e-3);
-  EXPECT_NEAR(phases[2].amount, 20.7, 5e-2);
-
-  EXPECT_STREQ(phases[3].standard_name.c_str(), "Opx(HGP)");
-  EXPECT_STREQ(phases[3].abbreviated_name.c_str(), "Opx");
-  EXPECT_STREQ(phases[3].full_name.c_str(), "orthopyroxene");
   EXPECT_NEAR(phases[3].weight_frac*100, 24.54, 5e-3);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseVolumeFractions)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_NEAR(phases[0].vol_frac*100, 13.56, 5e-3);
+  EXPECT_NEAR(phases[1].vol_frac*100, 0.00, 5e-3);
+  EXPECT_NEAR(phases[2].vol_frac*100, 61.68, 5e-3);
   EXPECT_NEAR(phases[3].vol_frac*100, 24.75, 5e-3);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseMolarFractions)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_NEAR(phases[0].mol_frac*100, 10.36, 5e-3);
+  EXPECT_NEAR(phases[1].mol_frac*100, 0.0, 5e-3);
+  EXPECT_NEAR(phases[2].mol_frac*100, 69.931, 5e-3);
   EXPECT_NEAR(phases[3].mol_frac*100, 19.70, 5e-3);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseAmounts)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_NEAR(phases[0].amount, 3.07, 5e-3);
+  EXPECT_NEAR(phases[1].amount, 0.0, 5e-3);
+  EXPECT_NEAR(phases[2].amount, 20.7, 5e-2);
   EXPECT_NEAR(phases[3].amount, 5.83, 5e-3);
 }
 
-TEST_F(SimpleDataTest, CheckSystemProperties) {
-  SystemProperties props = system_props();
 
-  EXPECT_NEAR(props.density, 3249.3, 0.05);
-  EXPECT_NEAR(props.expansivity, 0.38575e-4, 5e-9);
-  EXPECT_NEAR(props.molar_entropy, 11996, 0.5);
-  EXPECT_NEAR(props.molar_heat_capacity, 6244.7, 0.05);
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseCompositions)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_STREQ(phases[0].composition[0].name.c_str(), "SiO2");
+
+  EXPECT_NEAR(phases[1].composition[1].amount, 0.00000, 5e-6);
+  EXPECT_NEAR(phases[2].composition[2].amount, 1.77645, 5e-6);
+  EXPECT_NEAR(phases[3].composition[3].amount, 0.17159, 5e-6);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultDensity)
+{
+  EXPECT_NEAR(result.density, 3249.3, 0.05);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultExpansivity)
+{
+  EXPECT_NEAR(result.expansivity, 0.38575e-4, 5e-9);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultMolarEntropy)
+{
+  EXPECT_NEAR(result.molar_entropy, 11996, 0.5);
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultMolarHeatCapacity)
+{
+  EXPECT_NEAR(result.molar_heat_capacity, 6244.7, 0.05);
 }

@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <unistd.h>
 
+#include <perplexcpp/base.h>
 #include <perplexcpp/utils.h>
 
 #include "c_interface.h"
@@ -35,7 +36,7 @@ namespace perplexcpp
   namespace
   {
     /**
-     * ???
+     * @return The composition component names.
      */
     std::vector<std::string> get_composition_component_names()
     {
@@ -47,7 +48,7 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * @return The bulk composition.
      */
     std::vector<CompositionComponent> get_bulk_composition()
     {
@@ -64,7 +65,9 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * @param phase_index The phase index.
+     *
+     * @return The phase name.
      */
     PhaseName get_phase_name(size_t phase_index)
     {
@@ -77,7 +80,7 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * @return The phase names.
      */
     std::vector<PhaseName> get_phase_names()
     {
@@ -89,7 +92,9 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * @param end_phase_index The index for the phase for the result phase array.
+     *
+     * @return The phase composition.
      */
     std::vector<CompositionComponent> get_phase_composition(size_t end_phase_index)
     {
@@ -106,7 +111,8 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * @return A map mapping the phase index in the solution array in Perple_X (key)
+     *         with the phase index in the result array (value).
      */
     std::unordered_map<size_t,size_t> get_phase_index_mapping()
     {
@@ -142,7 +148,7 @@ namespace perplexcpp
 	  0.0,  // vol_frac
 	  0.0,  // mol_frac
 	  0.0,  // amount
-	  std::vector<CompositionComponent>(composition_props_get_n_components())  // composition
+	  make_empty_composition(get_composition_component_names())  // composition
 	};
 
 	// Check to see if the solution phase is present in the end phases.
@@ -154,6 +160,8 @@ namespace perplexcpp
 	  phase.amount = res_phase_props_get_mol(map[i]);
 	  phase.composition = get_phase_composition(map[i]);
 	}
+
+	phases.push_back(phase);
       }
       return phases;
     }

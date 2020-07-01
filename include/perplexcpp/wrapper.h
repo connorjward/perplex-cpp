@@ -27,127 +27,49 @@
 #include <unordered_map>
 #include <vector>
 
+#include <perplexcpp/base.h>
+
 
 namespace perplexcpp
 {
   /**
-   * A struct representing a composition component.
+   * A struct containing the outputs from a call to minimize().
    */
-  struct CompositionComponent
-  {
-    /**
-     * The chemical name of the component.
-     */
-    std::string name;
-
-
-    /**
-     * The molar amount of the component.
-     */
-    double amount;
-  };
-
-
-
-  /**
-   * A struct containing phase name information. In Perple_X, phases are represented
-   * with 3 name: one specific to Perple_X, an abbreviated version and a full version.
-   */
-  struct PhaseName
-  {
-    /**
-     * The name of the phase used by Perple_X.
-     */
-    std::string standard;
-
-
-    /**
-     * The shortened form of the phase name.
-     */
-    std::string abbreviated;
-
-
-    /**
-     * The long form of the phase name.
-     */
-    std::string full;
-  };
-
-
-
-  /**
-   * A struct containg phase information.
-   */
-  struct Phase
-  {
-    /**
-     * The phase name.
-     */
-    PhaseName name;
-
-
-    /**
-     * The fractional amount of the phase (by weight).
-     */
-    double weight_frac;
-
-
-    /**
-     * The fractional amount of the phase (by volume).
-     */
-    double vol_frac;
-
-
-    /**
-     * The fractional amount of the phase (by molar amount).
-     */
-    double mol_frac;
-
-
-    /**
-     * The amount of the phase (mol).
-     */
-    double amount;
-
-
-    /**
-     * The phase composition.
-     */
-    std::vector<CompositionComponent> composition;
-  };
-
-
-
   struct MinimizeResult
   {
     /**
-     * ???
+     * The resulting phases.
      */
     std::vector<Phase> phases;
 
 
     /**
-     * ???
+     * The bulk composition.
+     */
+    std::vector<CompositionComponent> composition;
+
+    /**
+     * The total number of moles in the bulk composition.
      */
     double n_moles;
 
     /**
-     * ???
+     * The density (kg/m3).
      */
     double density;
 
     /**
-     * ???
+     * The expansivity (1/K).
      */
     double expansivity;
 
     /**
-     * ???
+     * The molar entropy (J/K).
      */
     double molar_entropy;
 
     /**
-     * ???
+     * The molar heat capacity (J/K).
      */
     double molar_heat_capacity;
   };
@@ -201,13 +123,13 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * The number of phases.
        */
       const size_t n_phases;
 
 
       /**
-       * ???
+       * The phase names.
        */
       const std::vector<PhaseName> phase_names;
 
@@ -243,6 +165,12 @@ namespace perplexcpp
        */
       size_t find_phase_index_from_name(const std::string& name) const;
 
+
+      // Disable copy constructors because the object is a singleton. 
+      // These are public to improve error messages.
+      // (source: https://stackoverflow.com/questions/1008019/c-singleton-design-pattern)
+      Wrapper(Wrapper const&) = delete;
+      void operator=(Wrapper const&) = delete;
 
     private:
 
