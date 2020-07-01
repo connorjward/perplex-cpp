@@ -69,7 +69,7 @@ namespace perplexcpp
      *
      * @return The phase name.
      */
-    PhaseName get_phase_name(size_t phase_index)
+    PhaseName get_phase_name(const size_t phase_index)
     {
 	return PhaseName {
 	  soln_phase_props_get_name(phase_index),  // standard
@@ -96,7 +96,7 @@ namespace perplexcpp
      *
      * @return The phase composition.
      */
-    std::vector<CompositionComponent> get_phase_composition(size_t end_phase_index)
+    std::vector<CompositionComponent> get_phase_composition(const size_t end_phase_index)
     {
       std::vector<CompositionComponent> composition;
       for (size_t i = 0; i < composition_props_get_n_components(); ++i) {
@@ -107,6 +107,28 @@ namespace perplexcpp
 	composition.push_back(component);
       }
       return composition;
+    }
+
+
+    /**
+     * Find the phase index for a given phase name.
+     *
+     * @param phase_name The phase name.
+     *
+     * @return The corresponding phase index.
+     */
+    size_t find_phase_index_from_name(const std::string& phase_name)
+    {
+      for (size_t i = 0; i < soln_phase_props_get_n(); ++i) {
+	if (phase_name == get_phase_name(i).standard ||
+	    phase_name == get_phase_name(i).abbreviated || 
+	    phase_name == get_phase_name(i).full) {
+	  return i;
+	}
+      }
+      throw std::invalid_argument("The phase name '" +
+	                          phase_name +
+				  "' was not found among the solution models.");
     }
 
 
@@ -124,13 +146,18 @@ namespace perplexcpp
 	// If the Perple_X models are poorly suited to the problem at hand they may
 	// sometimes return phases that are not among the solution models (e.g. faTL).
 	// These phases are often present in extremely small amounts and so can be
-	// disregarded. However, if you are seeing lots of error messages that implies
+	// disregarded. However, if you are seeing lots of error messages or if the 
+	// fraction of material that is unrecognised is large it implies
 	// that you need to edit your parameter files.
 	try {
-	  idx_map.emplace(Wrapper::get_instance().find_phase_index_from_name(phase_name), i);
-	} catch (const std::invalid_argument& e) {
-	  std::cerr << e.what() << std::endl;
-	  std::cerr << phase_name << " : " << res_phase_props_get_mol_frac(i) << std::endl;
+	  idx_map.emplace(find_phase_index_from_name(phase_name), i);
+	} 
+	catch (const std::invalid_argument& e) {
+	  std::cerr << e.what() 
+	            << std::endl
+	            << phase_name << " constitutes " << res_phase_props_get_mol_frac(i)*100
+	            << "\% of the end phases. If this number is large you may need to "
+	            << "edit your Perple_X problem definition file.";
 	}
       }
       return idx_map;
@@ -251,6 +278,7 @@ namespace perplexcpp
 
     return MinimizeResult {
       get_phases(),  // phases
+      composition,  // composition
       get_n_moles(),  // n_moles
       sys_props_get_density(),  // density
       sys_props_get_expansivity(),  // expansivity
@@ -264,19 +292,6 @@ namespace perplexcpp
   Wrapper::minimize(const double pressure, const double temperature) const
   {
     return minimize(pressure, temperature, initial_composition);
-  }
-
-
-  size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
-  {
-    for (size_t i = 0; i < n_phases; ++i) {
-      if (phase_name == get_phase_name(i).standard ||
-	  phase_name == get_phase_name(i).abbreviated || 
-	  phase_name == get_phase_name(i).full) {
-	return i;
-      }
-    }
-    throw std::invalid_argument("The phase name was not found.");
   }
 
 

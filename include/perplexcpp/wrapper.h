@@ -158,14 +158,6 @@ namespace perplexcpp
       minimize(const double pressure, const double temperature) const;
 
 
-      /**
-       * Find the phase index for a given phase name.
-       *
-       * @param name The phase name
-       */
-      size_t find_phase_index_from_name(const std::string& name) const;
-
-
       // Disable copy constructors because the object is a singleton. 
       // These are public to improve error messages.
       // (source: https://stackoverflow.com/questions/1008019/c-singleton-design-pattern)

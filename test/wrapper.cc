@@ -39,10 +39,8 @@ class WrapperSimpleDataTest : public ::testing::Test {
 
       const double pressure = utils::convert_bar_to_pascals(20000);
       const double temperature = 1500;
-      auto composition = make_composition(wrapper.composition_component_names, 
-	                                  {38.500, 2.820, 50.500, 5.880});
 
-      result = wrapper.minimize(pressure, temperature, composition);
+      result = wrapper.minimize(pressure, temperature);
     }
 
     
@@ -117,6 +115,26 @@ TEST_F(WrapperSimpleDataTest, CheckPhaseNames)
   EXPECT_STREQ(names[3].standard.c_str(), "Opx(HGP)");
   EXPECT_STREQ(names[3].abbreviated.c_str(), "Opx");
   EXPECT_STREQ(names[3].full.c_str(), "orthopyroxene");
+}
+
+
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultComposition)
+{
+  auto comp = result.composition;
+
+  ASSERT_EQ(comp.size(), 4);
+
+  EXPECT_STREQ(comp[0].name.c_str(), "SiO2");
+  EXPECT_NEAR(comp[0].amount, 38.500, 5e-4);
+
+  EXPECT_STREQ(comp[1].name.c_str(), "CaO");
+  EXPECT_NEAR(comp[1].amount, 2.820, 5e-4);
+
+  EXPECT_STREQ(comp[2].name.c_str(), "MgO");
+  EXPECT_NEAR(comp[2].amount, 50.500, 5e-4);
+
+  EXPECT_STREQ(comp[3].name.c_str(), "FeO");
+  EXPECT_NEAR(comp[3].amount, 5.880, 5e-4);
 }
 
 
