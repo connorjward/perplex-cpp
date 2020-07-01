@@ -38,11 +38,81 @@ namespace perplexcpp
     std::string name;
 
 
+
     /**
      * The molar amount of the component.
      */
     double amount;
   };
+
+
+
+  /**
+   * A struct containg phase information.
+   */
+  struct Phase
+  {
+    /**
+     * The name of the phase used by Perple_X.
+     */
+    std::string standard_name;
+
+
+    /**
+     * The shortened form of the phase name.
+     */
+    std::string abbreviated_name;
+
+
+    /**
+     * The long form of the phase name.
+     */
+    std::string full_name;
+
+
+    /**
+     * The fractional amount of the phase (by weight).
+     */
+    double weight_frac;
+
+
+    /**
+     * The fractional amount of the phase (by volume).
+     */
+    double vol_frac;
+
+
+    /**
+     * The fractional amount of the phase (by molar amount).
+     */
+    double mol_frac;
+
+
+    /**
+     * The amount of the phase (mol).
+     */
+    double amount;
+
+
+    /**
+     * The phase composition.
+     */
+    std::vector<CompositionComponent> composition;
+  };
+
+
+
+  struct MinimizeResult
+  {
+    std::vector<Phase> phases;
+    double n_moles;
+    double density;
+    double expansivity;
+    double molar_entropy;
+    double molar_heat_capacity;
+    // TODO complete this...
+  };
+
 
 
   /**
@@ -55,7 +125,6 @@ namespace perplexcpp
   class Wrapper
   {
     public:
-
       /**
        * Initialize Perple_X.
        *
@@ -88,7 +157,26 @@ namespace perplexcpp
       /**
        * The initial bulk composition.
        */
-      const std::vector<double> initial_composition;
+      const std::vector<CompositionComponent> initial_composition;
+
+
+      /**
+       * ???
+       */
+      const size_t n_phases;
+
+
+      /**
+       * Perform the minimization using MEEMUM. 
+       *
+       * @param pressure    The pressure (Pa).
+       * @param temperature The temperature (K).
+       * @param composition The bulk composition. 
+       */
+      MinimizeResult 
+      minimize(const double pressure, 
+	       const double temperature,
+	       const std::vector<CompositionComponent>& composition) const;
 
 
       /**
@@ -97,73 +185,10 @@ namespace perplexcpp
        *
        * @param pressure    The pressure (Pa).
        * @param temperature The temperature (K).
-       * @param composition The bulk composition. Each element in the vector 
-       *                    corresponds to the amount, in moles, of a
-       *                    composition component.
        */
-      void minimize(const double pressure, 
-	            const double temperature,
-		    const std::vector<double>& composition);
+      MinimizeResult 
+      minimize(const double pressure, const double temperature) const;
 
-
-      /**
-       * Perform the minimization using MEEMUM. The composition in use is the
-       * initial composition specified in the Perple_X problem definition file.
-       *
-       * @param pressure    The pressure (Pa).
-       * @param temperature The temperature (K).
-       */
-      void minimize(const double pressure, const double temperature);
-
-      /**
-       * @return The total number of moles of substance.
-       */
-      double get_n_moles() const;
-
-      /**
-       * @return The number of phases.
-       */
-      size_t get_n_phases() const;
-
-      /**
-       * @return The standard phase names.
-       */
-      const std::vector<std::string>& get_phase_names() const;
-
-      /**
-       * @return The abbreviated phase names.
-       */
-      const std::vector<std::string>& get_abbr_phase_names() const;
-
-      /**
-       * @return The full phase names.
-       */
-      const std::vector<std::string>& get_full_phase_names() const;
-
-      /**
-       * @return The phase weight fractions.
-       */
-      const std::vector<double>& get_phase_weight_fracs() const;
-
-      /**
-       * @return The phase volume fractions.
-       */
-      const std::vector<double>& get_phase_vol_fracs() const;
-
-      /**
-       * @return The phase molar fractions.
-       */
-      const std::vector<double>& get_phase_mol_fracs() const;
-
-      /**
-       * @return The phase amounts (mol).
-       */
-      const std::vector<double>& get_phase_amounts() const;
-
-      /**
-       * @return The phase compositions.
-       */
-      const std::vector<std::vector<double>>& get_phase_compositions() const;
 
       /**
        * Find the phase index for a given phase name.
@@ -172,28 +197,8 @@ namespace perplexcpp
        */
       size_t find_phase_index_from_name(const std::string& name) const;
 
-      /**
-       * @return The system density (kg/m3).
-       */
-      double get_system_density() const;
-
-      /**
-       * @return The system expansivity (1/K).
-       */
-      double get_system_expansivity() const;
-
-      /**
-       * @return The system molar entropy (J/K).
-       */
-      double get_system_molar_entropy() const;
-
-      /**
-       * @return The system molar heat capacity (J/K).
-       */
-      double get_system_molar_heat_capacity() const;
 
     private:
-
       /**
        * Flag indicating whether or not the wrapper has been initialized.
        */
@@ -213,23 +218,11 @@ namespace perplexcpp
 
 
       /**
-       * A boolean indicating whether minimize() has been called.
-       */
-      bool minimized = false;
-
-
-      /**
        * Construct the class.
        *
        * @remark This constructor is private to enforce the singleton pattern.
        */
       Wrapper();
-
-
-      /**
-       * Check if minimize() has been called and throw an exception if not.
-       */
-      void check_minimized() const;
 
 
       /**

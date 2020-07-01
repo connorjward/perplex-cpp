@@ -24,6 +24,7 @@ namespace perplexcpp
 {
   namespace utils
   {
+
     /**
      * @param pressure_in_pascals
      * @return                    The pressure in bar.
@@ -35,6 +36,17 @@ namespace perplexcpp
      * @return                The pressure in pascals.
      */
     double convert_bar_to_pascals(const double pressure_in_bar);
+
+
+    /**
+     * @return The file descriptor pointing to stdout.
+     */
+    int disable_stdout();
+
+    /**
+     * @param stdout_descriptor The file descriptor pointing to stdout.
+     */
+    void enable_stdout(const int stdout_descriptor);
   }
 }
 
