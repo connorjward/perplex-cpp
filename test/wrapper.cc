@@ -61,77 +61,44 @@ TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
 
 TEST_F(WrapperSimpleDataTest, CheckNPhases) 
 {
-  EXPECT_EQ(Wrapper::get_instance().get_n_phases(), 4);
+  EXPECT_EQ(n_phases(), 4);
 }
 
-TEST_F(WrapperSimpleDataTest, CheckPhaseNames)
+TEST_F(SimpleDataTest, CheckPhases)
 {
-  auto names = Wrapper::get_instance().get_phase_names();
+  std::vector<Phase> phases = perplexcpp::phases();
 
-  EXPECT_STREQ(names[0].c_str(), "Cpx(HGP)");
-  EXPECT_STREQ(names[1].c_str(), "melt(HGP)");
-  EXPECT_STREQ(names[2].c_str(), "O(HGP)");
-  EXPECT_STREQ(names[3].c_str(), "Opx(HGP)");
-}
+  EXPECT_STREQ(phases[0].standard_name.c_str(), "Cpx(HGP)");
+  EXPECT_STREQ(phases[0].abbreviated_name.c_str(), "Cpx");
+  EXPECT_STREQ(phases[0].full_name.c_str(), "clinopyroxene");
+  EXPECT_NEAR(phases[0].weight_frac*100, 13.44, 5e-3);
+  EXPECT_NEAR(phases[0].vol_frac*100, 13.56, 5e-3);
+  EXPECT_NEAR(phases[0].mol_frac*100, 10.36, 5e-3);
+  EXPECT_NEAR(phases[0].amount, 3.07, 5e-3);
 
-TEST_F(WrapperSimpleDataTest, CheckAbbrPhaseNames)
-{
-  auto names = Wrapper::get_instance().get_abbr_phase_names();
+  EXPECT_STREQ(phases[1].standard_name.c_str(), "melt(HGP)");
+  EXPECT_STREQ(phases[1].abbreviated_name.c_str(), "Melt");
+  EXPECT_STREQ(phases[1].full_name.c_str(), "liquid");
+  EXPECT_NEAR(phases[1].weight_frac*100, 0.00, 5e-3);
+  EXPECT_NEAR(phases[1].vol_frac*100, 0.00, 5e-3);
+  EXPECT_NEAR(phases[1].mol_frac*100, 0.0, 5e-3);
+  EXPECT_NEAR(phases[1].amount, 0.0, 5e-3);
 
-  EXPECT_STREQ(names[0].c_str(), "Cpx");
-  EXPECT_STREQ(names[1].c_str(), "Melt");
-  EXPECT_STREQ(names[2].c_str(), "Ol");
-  EXPECT_STREQ(names[3].c_str(), "Opx");
-}
+  EXPECT_STREQ(phases[2].standard_name.c_str(), "O(HGP)");
+  EXPECT_STREQ(phases[2].abbreviated_name.c_str(), "Ol");
+  EXPECT_STREQ(phases[2].full_name.c_str(), "olivine");
+  EXPECT_NEAR(phases[2].weight_frac*100, 62.02, 5e-3);
+  EXPECT_NEAR(phases[2].vol_frac*100, 61.68, 5e-3);
+  EXPECT_NEAR(phases[2].mol_frac*100, 69.931, 5e-3);
+  EXPECT_NEAR(phases[2].amount, 20.7, 5e-2);
 
-TEST_F(WrapperSimpleDataTest, CheckFullPhaseNames)
-{
-  auto names = Wrapper::get_instance().get_full_phase_names();
-
-  EXPECT_STREQ(names[0].c_str(), "clinopyroxene");
-  EXPECT_STREQ(names[1].c_str(), "liquid");
-  EXPECT_STREQ(names[2].c_str(), "olivine");
-  EXPECT_STREQ(names[3].c_str(), "orthopyroxene");
-}
-
-TEST_F(WrapperSimpleDataTest, CheckPhaseWeightFracs)
-{
-  auto fracs = Wrapper::get_instance().get_phase_weight_fracs();
-
-  EXPECT_NEAR(fracs[0]*100, 13.44, 5e-3);
-  EXPECT_NEAR(fracs[1]*100, 0.00, 5e-3);
-  EXPECT_NEAR(fracs[2]*100, 62.02, 5e-3);
-  EXPECT_NEAR(fracs[3]*100, 24.54, 5e-3);
-}
-
-TEST_F(WrapperSimpleDataTest, CheckPhaseVolFracs)
-{
-  auto fracs = Wrapper::get_instance().get_phase_vol_fracs();
-
-  EXPECT_NEAR(fracs[0]*100, 13.56, 5e-3);
-  EXPECT_NEAR(fracs[1]*100, 0.00, 5e-3);
-  EXPECT_NEAR(fracs[2]*100, 61.68, 5e-3);
-  EXPECT_NEAR(fracs[3]*100, 24.75, 5e-3);
-}
-
-TEST_F(WrapperSimpleDataTest, CheckPhaseMolFracs)
-{
-  auto fracs = Wrapper::get_instance().get_phase_mol_fracs();
-
-  EXPECT_NEAR(fracs[0]*100, 10.36, 5e-3);
-  EXPECT_NEAR(fracs[1]*100, 0.0, 5e-3);
-  EXPECT_NEAR(fracs[2]*100, 69.931, 5e-3);
-  EXPECT_NEAR(fracs[3]*100, 19.70, 5e-3);
-}
-
-TEST_F(WrapperSimpleDataTest, CheckPhaseAmounts) 
-{
-  auto amounts = Wrapper::get_instance().get_phase_amounts();
-
-  EXPECT_NEAR(amounts[0], 3.07, 5e-3);
-  EXPECT_NEAR(amounts[1], 0.0, 5e-3);
-  EXPECT_NEAR(amounts[2], 20.7, 5e-2);
-  EXPECT_NEAR(amounts[3], 5.83, 5e-3);
+  EXPECT_STREQ(phases[3].standard_name.c_str(), "Opx(HGP)");
+  EXPECT_STREQ(phases[3].abbreviated_name.c_str(), "Opx");
+  EXPECT_STREQ(phases[3].full_name.c_str(), "orthopyroxene");
+  EXPECT_NEAR(phases[3].weight_frac*100, 24.54, 5e-3);
+  EXPECT_NEAR(phases[3].vol_frac*100, 24.75, 5e-3);
+  EXPECT_NEAR(phases[3].mol_frac*100, 19.70, 5e-3);
+  EXPECT_NEAR(phases[3].amount, 5.83, 5e-3);
 }
 
 TEST_F(WrapperSimpleDataTest, CheckSystemDensity) {
