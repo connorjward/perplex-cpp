@@ -30,14 +30,10 @@
 #include "c_interface.h"
 
 
-
-
-
 namespace perplexcpp
 {
   namespace
   {
-
     /**
      * ???
      */
@@ -53,7 +49,7 @@ namespace perplexcpp
     /**
      * ???
      */
-    std::vector<CompositionComponent> bulk_composition()
+    std::vector<CompositionComponent> get_bulk_composition()
     {
       std::vector<CompositionComponent> bulk;
       for (size_t i = 0; i < composition_props_get_n_components(); ++i) {
@@ -70,11 +66,24 @@ namespace perplexcpp
     /**
      * ???
      */
-    std::vector<std::string> phase_names()
+    PhaseName get_phase_name(size_t phase_index)
     {
-      std::vector<std::string> names;
+	return PhaseName {
+	  soln_phase_props_get_name(phase_index),  // standard
+	  soln_phase_props_get_abbr_name(phase_index),  // abbreviated
+	  soln_phase_props_get_full_name(phase_index)  // full
+	};
+    }
+
+
+    /**
+     * ???
+     */
+    std::vector<PhaseName> get_phase_names()
+    {
+      std::vector<PhaseName> names;
       for (size_t i = 0; i < soln_phase_props_get_n(); ++i)
-	names.push_back(soln_phase_props_get_name(i));
+	names.push_back(get_phase_name(i));
       return names;
     }
 
@@ -82,31 +91,7 @@ namespace perplexcpp
     /**
      * ???
      */
-    std::vector<std::string> abbr_phase_names()
-    {
-      std::vector<std::string> names;
-      for (size_t i = 0; i < soln_phase_props_get_n(); ++i)
-	names.push_back(soln_phase_props_get_abbr_name(i));
-      return names;
-    }
-
-
-    /**
-     * ???
-     */
-    std::vector<std::string> full_phase_names()
-    {
-      std::vector<std::string> names;
-      for (size_t i = 0; i < soln_phase_props_get_n(); ++i)
-	names.push_back(soln_phase_props_get_full_name(i));
-      return names;
-    }
-
-
-    /**
-     * ???
-     */
-    std::vector<CompositionComponent> phase_composition(size_t end_phase_index)
+    std::vector<CompositionComponent> get_phase_composition(size_t end_phase_index)
     {
       std::vector<CompositionComponent> composition;
       for (size_t i = 0; i < composition_props_get_n_components(); ++i) {
@@ -145,16 +130,14 @@ namespace perplexcpp
       return idx_map;
     }
 
-    std::vector<Phase> phases()
+    std::vector<Phase> get_phases()
     {
       std::vector<Phase> phases;
 
       auto map = get_phase_index_mapping();
       for (size_t i = 0; i < soln_phase_props_get_n(); ++i) {
 	Phase phase = { 
-	  soln_phase_props_get_name(i),  // standard_name
-	  soln_phase_props_get_abbr_name(i),  // abbreviated_name
-	  soln_phase_props_get_full_name(i),  // full_name
+	  get_phase_name(i),  // name
 	  0.0,  // weight_frac
 	  0.0,  // vol_frac
 	  0.0,  // mol_frac
@@ -169,14 +152,14 @@ namespace perplexcpp
 	  phase.vol_frac = res_phase_props_get_vol_frac(map[i]);
 	  phase.mol_frac = res_phase_props_get_mol_frac(map[i]);
 	  phase.amount = res_phase_props_get_mol(map[i]);
-	  phase.composition = phase_composition(map[i]);
+	  phase.composition = get_phase_composition(map[i]);
 	}
       }
       return phases;
     }
 
 
-    double n_moles()
+    double get_n_moles()
     {
       double n = 0.0;
       for (size_t i = 0; i < res_phase_props_get_n(); ++i)
@@ -259,8 +242,8 @@ namespace perplexcpp
 #endif
 
     return MinimizeResult {
-      phases(),  // phases
-      n_moles(),  // n_moles
+      get_phases(),  // phases
+      get_n_moles(),  // n_moles
       sys_props_get_density(),  // density
       sys_props_get_expansivity(),  // expansivity
       sys_props_get_mol_entropy(),  // molar_entropy
@@ -278,18 +261,10 @@ namespace perplexcpp
 
   size_t Wrapper::find_phase_index_from_name(const std::string& phase_name) const
   {
-    auto standard_names = phase_names();
-    auto abbr_names = abbr_phase_names();
-    auto full_names = full_phase_names();
-    
-    assert(standard_names.size() == n_phases);
-    assert(abbr_names.size() == n_phases);
-    assert(full_names.size() == n_phases);
-
     for (size_t i = 0; i < n_phases; ++i) {
-      if (phase_name == standard_names[i] ||
-	  phase_name == abbr_names[i] || 
-	  phase_name == full_names[i]) {
+      if (phase_name == get_phase_name(i).standard ||
+	  phase_name == get_phase_name(i).abbreviated || 
+	  phase_name == get_phase_name(i).full) {
 	return i;
       }
     }
@@ -304,9 +279,8 @@ namespace perplexcpp
   Wrapper::Wrapper() 
   : n_composition_components(composition_props_get_n_components()),
     composition_component_names(get_composition_component_names()),
-    initial_composition(bulk_composition()),
-    n_phases(soln_phase_props_get_n())
+    initial_composition(get_bulk_composition()),
+    n_phases(soln_phase_props_get_n()),
+    phase_names(get_phase_names())
   {}
-
-
 }

@@ -17,13 +17,16 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
 #ifndef PERPLEXCPP_WRAPPER_H
 #define PERPLEXCPP_WRAPPER_H
+
 
 #include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 
 namespace perplexcpp
 {
@@ -38,11 +41,36 @@ namespace perplexcpp
     std::string name;
 
 
-
     /**
      * The molar amount of the component.
      */
     double amount;
+  };
+
+
+
+  /**
+   * A struct containing phase name information. In Perple_X, phases are represented
+   * with 3 name: one specific to Perple_X, an abbreviated version and a full version.
+   */
+  struct PhaseName
+  {
+    /**
+     * The name of the phase used by Perple_X.
+     */
+    std::string standard;
+
+
+    /**
+     * The shortened form of the phase name.
+     */
+    std::string abbreviated;
+
+
+    /**
+     * The long form of the phase name.
+     */
+    std::string full;
   };
 
 
@@ -53,21 +81,9 @@ namespace perplexcpp
   struct Phase
   {
     /**
-     * The name of the phase used by Perple_X.
+     * The phase name.
      */
-    std::string standard_name;
-
-
-    /**
-     * The shortened form of the phase name.
-     */
-    std::string abbreviated_name;
-
-
-    /**
-     * The long form of the phase name.
-     */
-    std::string full_name;
+    PhaseName name;
 
 
     /**
@@ -104,13 +120,36 @@ namespace perplexcpp
 
   struct MinimizeResult
   {
+    /**
+     * ???
+     */
     std::vector<Phase> phases;
+
+
+    /**
+     * ???
+     */
     double n_moles;
+
+    /**
+     * ???
+     */
     double density;
+
+    /**
+     * ???
+     */
     double expansivity;
+
+    /**
+     * ???
+     */
     double molar_entropy;
+
+    /**
+     * ???
+     */
     double molar_heat_capacity;
-    // TODO complete this...
   };
 
 
@@ -125,6 +164,7 @@ namespace perplexcpp
   class Wrapper
   {
     public:
+
       /**
        * Initialize Perple_X.
        *
@@ -167,6 +207,12 @@ namespace perplexcpp
 
 
       /**
+       * ???
+       */
+      const std::vector<PhaseName> phase_names;
+
+
+      /**
        * Perform the minimization using MEEMUM. 
        *
        * @param pressure    The pressure (Pa).
@@ -199,22 +245,11 @@ namespace perplexcpp
 
 
     private:
+
       /**
        * Flag indicating whether or not the wrapper has been initialized.
        */
       static bool initialized;
-
-
-      /**
-       * @return The composition component names.
-       */
-      static std::vector<std::string> load_composition_component_names();
-
-
-      /**
-       * @return The bulk composition.
-       */
-      static std::vector<double> load_bulk_composition();
 
 
       /**
@@ -223,36 +258,6 @@ namespace perplexcpp
        * @remark This constructor is private to enforce the singleton pattern.
        */
       Wrapper();
-
-
-      /**
-       * @return The number of end phases.
-       *
-       * @remark This method is necessary because Perple_X differentiates between
-       *         solution and end phases so the number of the latter can change.
-       */
-      size_t get_n_end_phases() const;
-
-
-      /**
-       * Read some phase quantity into an array.
-       *
-       * @param get_quantity A function pointer to the Perple_X interface function.
-       * @param out          The output array that results are read into.
-       */
-      void load_phase_quantity(double (*get_quantity)(size_t),
-	                       std::vector<double>& out) const;
-
-
-      /**
-       * @return A map where the keys are the solution phase indices and
-       *         the values are the corresponding end phase indices.
-       *
-       * @remark This is necessary because Perple_X differentiates between the
-       *         end phases and solution phases and their indexing is different.
-       *
-       */
-      const std::unordered_map<size_t,size_t>& get_phase_index_mapping() const;
   };
 }
 
