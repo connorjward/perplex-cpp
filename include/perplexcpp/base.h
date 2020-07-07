@@ -28,26 +28,6 @@
 
 namespace perplexcpp
 {
-
-  /**
-   * A struct representing a composition component.
-   */
-  struct CompositionComponent
-  {
-    /**
-     * The chemical name of the component.
-     */
-    std::string name;
-
-
-    /**
-     * The molar amount of the component.
-     */
-    double amount;
-  };
-
-
-
   /**
    * A struct containing phase name information. In Perple_X, phases are represented
    * with 3 name: one specific to Perple_X, an abbreviated version and a full version.
@@ -112,32 +92,17 @@ namespace perplexcpp
     /**
      * The phase composition.
      */
-    std::vector<CompositionComponent> composition;
+    std::vector<double> composition;
   };
 
 
-  /**
-   * Create a composition vector.
-   *
-   * @param names   The names of the composition components.
-   * @param amounts The amounts (in moles) of each component.
-   *
-   * @return The composition vector.
-   */
-  std::vector<CompositionComponent> 
-  make_composition(std::vector<std::string> names,
-		   std::vector<double> amounts);
-
 
   /**
-   * Create a composition vector with all amounts set to zero.
+   * @param
    *
-   * @param names   The names of the composition components.
-   *
-   * @return The composition vector.
+   * @return
    */
-  std::vector<CompositionComponent> 
-  make_empty_composition(std::vector<std::string> names);
+  Phase find_phase(const std::vector<Phase> phases, const std::string name);
 }
 
 #endif

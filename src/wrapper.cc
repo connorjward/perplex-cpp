@@ -38,7 +38,7 @@ namespace perplexcpp
     /**
      * @return The composition component names.
      */
-    std::vector<std::string> get_composition_component_names()
+    std::vector<std::string> make_composition_component_names()
     {
       std::vector<std::string> names;
       for (size_t i = 0; i < composition_props_get_n_components(); ++i)
@@ -50,17 +50,12 @@ namespace perplexcpp
     /**
      * @return The bulk composition.
      */
-    std::vector<CompositionComponent> get_bulk_composition()
+    std::vector<double> make_bulk_composition()
     {
-      std::vector<CompositionComponent> bulk;
-      for (size_t i = 0; i < composition_props_get_n_components(); ++i) {
-	CompositionComponent comp = {
-	  composition_props_get_name(i),  // name
-	  bulk_props_get_composition(i)  // amount
-	};
-	bulk.push_back(comp);
-      }
-      return bulk;
+      std::vector<double> bulk_composition;
+      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+	bulk_composition.push_back(bulk_props_get_composition(i));
+      return bulk_composition;
     }
 
 
@@ -96,16 +91,11 @@ namespace perplexcpp
      *
      * @return The phase composition.
      */
-    std::vector<CompositionComponent> get_phase_composition(const size_t end_phase_index)
+    std::vector<double> get_phase_composition(const size_t end_phase_index)
     {
-      std::vector<CompositionComponent> composition;
-      for (size_t i = 0; i < composition_props_get_n_components(); ++i) {
-	CompositionComponent component = { 
-	  composition_props_get_name(i),  // name
-	  res_phase_props_get_composition(end_phase_index, i)  // amount
-	};
-	composition.push_back(component);
-      }
+      std::vector<double> composition;
+      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+	composition.push_back(res_phase_props_get_composition(end_phase_index, i));
       return composition;
     }
 
@@ -175,7 +165,7 @@ namespace perplexcpp
 	  0.0,  // vol_frac
 	  0.0,  // mol_frac
 	  0.0,  // amount
-	  make_empty_composition(get_composition_component_names())  // composition
+	  std::vector<double>(composition_props_get_n_components(), 0.0)  // composition
 	};
 
 	// Check to see if the solution phase is present in the end phases.
@@ -254,13 +244,13 @@ namespace perplexcpp
   MinimizeResult 
   Wrapper::minimize(const double pressure, 
                     const double temperature,
-		    const std::vector<CompositionComponent>& composition) const
+		    const std::vector<double>& composition) const
   {
     if (composition.size() != n_composition_components)
       throw std::invalid_argument("Specified bulk composition is the wrong size.");
 
     for (size_t i = 0; i < n_composition_components; ++i)
-      bulk_props_set_composition(i, composition[i].amount);
+      bulk_props_set_composition(i, composition[i]);
 
     solver_set_pressure(utils::convert_pascals_to_bar(pressure));
     solver_set_temperature(temperature);
@@ -291,7 +281,7 @@ namespace perplexcpp
   MinimizeResult
   Wrapper::minimize(const double pressure, const double temperature) const
   {
-    return minimize(pressure, temperature, initial_composition);
+    return minimize(pressure, temperature, this->initial_composition);
   }
 
 
@@ -301,8 +291,8 @@ namespace perplexcpp
 
   Wrapper::Wrapper() 
   : n_composition_components(composition_props_get_n_components()),
-    composition_component_names(get_composition_component_names()),
-    initial_composition(get_bulk_composition()),
+    composition_component_names(make_composition_component_names()),
+    initial_composition(make_bulk_composition()),
     n_phases(soln_phase_props_get_n()),
     phase_names(get_phase_names())
   {}

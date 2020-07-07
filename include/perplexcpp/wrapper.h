@@ -46,7 +46,7 @@ namespace perplexcpp
     /**
      * The bulk composition.
      */
-    std::vector<CompositionComponent> composition;
+    std::vector<double> composition;
 
     /**
      * The total number of moles in the bulk composition.
@@ -119,7 +119,7 @@ namespace perplexcpp
       /**
        * The initial bulk composition.
        */
-      const std::vector<CompositionComponent> initial_composition;
+      const std::vector<double> initial_composition;
 
 
       /**
@@ -144,7 +144,7 @@ namespace perplexcpp
       MinimizeResult 
       minimize(const double pressure, 
 	       const double temperature,
-	       const std::vector<CompositionComponent>& composition) const;
+	       const std::vector<double>& composition) const;
 
 
       /**

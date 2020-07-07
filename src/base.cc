@@ -25,26 +25,14 @@
 
 namespace perplexcpp
 {
-  std::vector<CompositionComponent>
-  make_composition(std::vector<std::string> names,
-		   std::vector<double> amounts)
+  Phase find_phase(const std::vector<Phase> phases, const std::string name)
   {
-    if (names.size() != amounts.size())
-      throw std::invalid_argument("Vector sizes do not match.");
-
-    std::vector<CompositionComponent> comp;
-    for (size_t i = 0; i < names.size(); ++i)
-      comp.push_back({names[i], amounts[i]});
-    return comp;
-  }
-
-
-  std::vector<CompositionComponent>
-  make_empty_composition(std::vector<std::string> names)
-  {
-    std::vector<CompositionComponent> comp;
-    for (size_t i = 0; i < names.size(); ++i)
-      comp.push_back({names[i], 0.0});
-    return comp;
+    for (auto phase : phases) {
+      if (name == phase.name.standard ||
+	  name == phase.name.abbreviated ||
+	  name == phase.name.full)
+	return phase;
+    }
+    throw std::invalid_argument("The name '" + name + "' could not be found.");
   }
 }

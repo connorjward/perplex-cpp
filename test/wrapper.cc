@@ -74,17 +74,10 @@ TEST_F(WrapperSimpleDataTest, CheckInitialComposition)
 
   ASSERT_EQ(comp.size(), 4);
 
-  EXPECT_STREQ(comp[0].name.c_str(), "SiO2");
-  EXPECT_NEAR(comp[0].amount, 38.500, 5e-4);
-
-  EXPECT_STREQ(comp[1].name.c_str(), "CaO");
-  EXPECT_NEAR(comp[1].amount, 2.820, 5e-4);
-
-  EXPECT_STREQ(comp[2].name.c_str(), "MgO");
-  EXPECT_NEAR(comp[2].amount, 50.500, 5e-4);
-
-  EXPECT_STREQ(comp[3].name.c_str(), "FeO");
-  EXPECT_NEAR(comp[3].amount, 5.880, 5e-4);
+  EXPECT_NEAR(comp[0], 38.500, 5e-4);
+  EXPECT_NEAR(comp[1], 2.820, 5e-4);
+  EXPECT_NEAR(comp[2], 50.500, 5e-4);
+  EXPECT_NEAR(comp[3], 5.880, 5e-4);
 }
 
 
@@ -124,17 +117,10 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultComposition)
 
   ASSERT_EQ(comp.size(), 4);
 
-  EXPECT_STREQ(comp[0].name.c_str(), "SiO2");
-  EXPECT_NEAR(comp[0].amount, 38.500, 5e-4);
-
-  EXPECT_STREQ(comp[1].name.c_str(), "CaO");
-  EXPECT_NEAR(comp[1].amount, 2.820, 5e-4);
-
-  EXPECT_STREQ(comp[2].name.c_str(), "MgO");
-  EXPECT_NEAR(comp[2].amount, 50.500, 5e-4);
-
-  EXPECT_STREQ(comp[3].name.c_str(), "FeO");
-  EXPECT_NEAR(comp[3].amount, 5.880, 5e-4);
+  EXPECT_NEAR(comp[0], 38.500, 5e-4);
+  EXPECT_NEAR(comp[1], 2.820, 5e-4);
+  EXPECT_NEAR(comp[2], 50.500, 5e-4);
+  EXPECT_NEAR(comp[3], 5.880, 5e-4);
 }
 
 
@@ -220,11 +206,9 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseCompositions)
 
   ASSERT_EQ(phases.size(), 4);
 
-  EXPECT_STREQ(phases[0].composition[0].name.c_str(), "SiO2");
-
-  EXPECT_NEAR(phases[1].composition[1].amount, 0.00000, 5e-6);
-  EXPECT_NEAR(phases[2].composition[2].amount, 1.77645, 5e-6);
-  EXPECT_NEAR(phases[3].composition[3].amount, 0.17159, 5e-6);
+  EXPECT_NEAR(phases[1].composition[1], 0.00000, 5e-6);
+  EXPECT_NEAR(phases[2].composition[2], 1.77645, 5e-6);
+  EXPECT_NEAR(phases[3].composition[3], 0.17159, 5e-6);
 }
 
 
