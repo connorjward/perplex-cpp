@@ -246,6 +246,12 @@ namespace perplexcpp
                     const double temperature,
 		    const std::vector<double>& composition) const
   {
+    if (pressure <= 0.0)
+      throw std::invalid_argument("The pressure must be a positive number.");
+
+    if (temperature <= 0.0)
+      throw std::invalid_argument("The temperature must be a positive number.");
+
     if (composition.size() != n_composition_components)
       throw std::invalid_argument("Specified bulk composition is the wrong size.");
 
