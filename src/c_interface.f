@@ -116,6 +116,51 @@
           v(2) = temperature
         end subroutine
 
+
+        function get_min_pressure() bind(c) result(res)
+          real(c_double) :: res
+
+          ! Source: rlib.f
+          double precision vmax, vmin, dv
+          common / cst9 / vmax(l2), vmin(l2), dv(l2)
+
+          res = vmin(1)
+        end function
+
+
+        function get_max_pressure() bind(c) result(res)
+          real(c_double) :: res
+
+          ! Source: rlib.f
+          double precision vmax, vmin, dv
+          common / cst9 / vmax(l2), vmin(l2), dv(l2)
+
+          res = vmax(1)
+        end function
+
+
+        function get_min_temperature() bind(c) result(res)
+          real(c_double) :: res
+
+          ! Source: rlib.f
+          double precision vmax, vmin, dv
+          common / cst9 / vmax(l2), vmin(l2), dv(l2)
+
+          res = vmin(2)
+        end function
+
+
+        function get_max_temperature() bind(c) result(res)
+          real(c_double) :: res
+
+          ! Source: rlib.f
+          double precision vmax, vmin, dv
+          common / cst9 / vmax(l2), vmin(l2), dv(l2)
+
+          res = vmax(2)
+        end function
+
+
         ! ------------------------------------------------------------
         ! ------------------ COMPOSITION PROPERTIES ------------------
         ! ------------------------------------------------------------

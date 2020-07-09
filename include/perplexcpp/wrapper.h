@@ -135,6 +135,29 @@ namespace perplexcpp
 
 
       /**
+       * The minimum pressure accepted (Pa).
+       */
+      const double min_pressure;
+
+      /**
+       * The maximum pressure accepted (Pa).
+       */
+      const double max_pressure;
+
+
+      /**
+       * The minimum temperature accepted (K).
+       */
+      const double min_temperature;
+
+
+      /**
+       * The maximum temperature accepted (K).
+       */
+      const double max_temperature;
+
+
+      /**
        * Perform the minimization using MEEMUM. 
        *
        * @param pressure    The pressure (Pa).

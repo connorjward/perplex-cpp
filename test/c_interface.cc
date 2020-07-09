@@ -43,6 +43,21 @@ class InterfaceTest : public ::testing::Test {
     }
 };
 
+
+TEST_F(InterfaceTest, CheckPressureBounds)
+{
+  EXPECT_NEAR(get_min_pressure(), 1, 0.5);
+  EXPECT_NEAR(get_max_pressure(), 50000, 0.5);
+}
+
+
+TEST_F(InterfaceTest, CheckTemperatureBounds)
+{
+  EXPECT_NEAR(get_min_temperature(), 1073, 0.5);
+  EXPECT_NEAR(get_max_temperature(), 2273, 0.5);
+}
+
+
 TEST_F(InterfaceTest, CheckCompositionProps) {
   EXPECT_EQ(composition_props_get_n_components(), 4);
 

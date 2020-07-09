@@ -50,6 +50,31 @@ extern "C"
    */
   void solver_set_temperature(const double temperature);
 
+
+  /**
+   * @return The minimum pressure (bar).
+   */
+  double get_min_pressure();
+
+
+  /**
+   * @return The maximum pressure (bar).
+   */
+  double get_max_pressure();
+
+
+  /**
+   * @return The minimum temperature (K).
+   */
+  double get_min_temperature();
+
+
+  /**
+   * @return The maximum temperature (K).
+   */
+  double get_max_temperature();
+
+
   /* ------------------------------------------------------------ */
   /* ------------------ COMPOSITION PROPERTIES ------------------ */
   /* ------------------------------------------------------------ */

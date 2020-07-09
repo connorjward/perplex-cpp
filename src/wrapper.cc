@@ -246,14 +246,18 @@ namespace perplexcpp
                     const double temperature,
 		    const std::vector<double>& composition) const
   {
-    if (pressure <= 0.0)
-      throw std::invalid_argument("The pressure must be a positive number.");
+    if (pressure < this->min_pressure)
+      throw std::invalid_argument("The pressure is too low");
+    else if (pressure > this->max_pressure)
+      throw std::invalid_argument("The pressure is too high");
 
-    if (temperature <= 0.0)
-      throw std::invalid_argument("The temperature must be a positive number.");
+    if (temperature < this->min_temperature)
+      throw std::invalid_argument("The temperature is too low");
+    else if (temperature > this->max_temperature)
+      throw std::invalid_argument("The temperature is too high");
 
     if (composition.size() != n_composition_components)
-      throw std::invalid_argument("Specified bulk composition is the wrong size.");
+      throw std::invalid_argument("The bulk composition is the wrong size");
 
     for (size_t i = 0; i < n_composition_components; ++i)
       bulk_props_set_composition(i, composition[i]);
@@ -300,6 +304,10 @@ namespace perplexcpp
     composition_component_names(make_composition_component_names()),
     initial_composition(make_bulk_composition()),
     n_phases(soln_phase_props_get_n()),
-    phase_names(get_phase_names())
+    phase_names(get_phase_names()),
+    min_pressure(utils::convert_bar_to_pascals(get_min_pressure())),
+    max_pressure(utils::convert_bar_to_pascals(get_max_pressure())),
+    min_temperature(get_min_temperature()),
+    max_temperature(get_max_temperature())
   {}
 }
