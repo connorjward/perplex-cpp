@@ -33,50 +33,6 @@
 namespace perplexcpp
 {
   /**
-   * A struct containing the outputs from a call to minimize().
-   */
-  struct MinimizeResult
-  {
-    /**
-     * The resulting phases.
-     */
-    std::vector<Phase> phases;
-
-
-    /**
-     * The bulk composition.
-     */
-    std::vector<double> composition;
-
-    /**
-     * The total number of moles in the bulk composition.
-     */
-    double n_moles;
-
-    /**
-     * The density (kg/m3).
-     */
-    double density;
-
-    /**
-     * The expansivity (1/K).
-     */
-    double expansivity;
-
-    /**
-     * The molar entropy (J/K).
-     */
-    double molar_entropy;
-
-    /**
-     * The molar heat capacity (J/K).
-     */
-    double molar_heat_capacity;
-  };
-
-
-
-  /**
    * A class that controls the access to the underlying Perple_X calculations
    * and results. It utilises the singleton design pattern (only a single
    * instance is ever created) because Perple_X relies heavily on global 
