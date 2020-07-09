@@ -12,6 +12,7 @@ add_library(
 
   base.cc
   c_interface.f
+  result_cache.cc
   utils.cc 
   wrapper.cc 
 

@@ -277,9 +277,11 @@ namespace perplexcpp
 #endif
 
     return MinimizeResult {
-      get_phases(),  // phases
+      pressure,  // pressure
+      temperature,  // temperature
       composition,  // composition
       get_n_moles(),  // n_moles
+      get_phases(),  // phases
       sys_props_get_density(),  // density
       sys_props_get_expansivity(),  // expansivity
       sys_props_get_mol_entropy(),  // molar_entropy

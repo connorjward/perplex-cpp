@@ -103,6 +103,64 @@ namespace perplexcpp
    * @return
    */
   Phase find_phase(const std::vector<Phase> phases, const std::string name);
+
+
+
+  /**
+   * A struct containing the outputs from a call to minimize().
+   */
+  struct MinimizeResult
+  {
+    /**
+     * The pressure (Pa).
+     */
+    double pressure;
+
+
+    /**
+     * The temperature (K).
+     */
+    double temperature;
+
+
+    /**
+     * The bulk composition.
+     */
+    std::vector<double> composition;
+
+
+    /**
+     * The total number of moles in the bulk composition.
+     */
+    double n_moles;
+
+
+    /**
+     * The resulting phases.
+     */
+    std::vector<Phase> phases;
+
+
+    /**
+     * The density (kg/m3).
+     */
+    double density;
+
+    /**
+     * The expansivity (1/K).
+     */
+    double expansivity;
+
+    /**
+     * The molar entropy (J/K).
+     */
+    double molar_entropy;
+
+    /**
+     * The molar heat capacity (J/K).
+     */
+    double molar_heat_capacity;
+  };
 }
 
 #endif
