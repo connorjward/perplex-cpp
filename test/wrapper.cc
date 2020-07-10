@@ -34,7 +34,7 @@ class WrapperSimpleDataTest : public ::testing::Test {
       const std::string problem_file = "test.dat";
       const std::string working_dir = "./simple";
 
-      Wrapper::initialize(problem_file, working_dir);
+      Wrapper::initialize(problem_file, working_dir, 10, 0.1);
       Wrapper& wrapper = Wrapper::get_instance();
 
       const double pressure = utils::convert_bar_to_pascals(20000);

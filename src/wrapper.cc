@@ -195,7 +195,9 @@ namespace perplexcpp
 
 
   void Wrapper::initialize(const std::string& problem_file, 
-			   const std::string& working_dir)
+			   const std::string& working_dir,
+			   const size_t cache_capacity,
+			   const double cache_rtol)
   {
     // Save the current working directory.
     char initial_dir[256];
@@ -204,7 +206,7 @@ namespace perplexcpp
 
     // Change working directory to the location of the Perple_X files.
     if (chdir(working_dir.c_str()) != 0)
-      throw std::invalid_argument("Could not change directory.");
+      throw std::runtime_error("Could not change directory.");
 
 #ifndef ALLOW_PERPLEX_OUTPUT
     // Disable stdout to prevent Perple_X dominating stdout.
@@ -225,6 +227,11 @@ namespace perplexcpp
     // Return to the original working directory.
     if (chdir(initial_dir) != 0)
       throw std::invalid_argument("Could not change directory.");
+
+
+    // Save cache properties.
+    Wrapper::cache_capacity = cache_capacity;
+    Wrapper::cache_rtol = cache_rtol;
 
     // Save that initialization is complete.
     initialized = true;
@@ -259,6 +266,15 @@ namespace perplexcpp
     if (composition.size() != n_composition_components)
       throw std::invalid_argument("The bulk composition is the wrong size");
 
+    // Before doing the calculation first check to see if the result is in the cache.
+    if (this->cache.capacity > 0)
+    {
+      const MinimizeResult *result = this->cache.get(pressure, temperature, composition);
+
+      if (result != nullptr)
+	return *result;
+    }
+
     for (size_t i = 0; i < n_composition_components; ++i)
       bulk_props_set_composition(i, composition[i]);
 
@@ -276,7 +292,7 @@ namespace perplexcpp
     utils::enable_stdout(fd);
 #endif
 
-    return MinimizeResult {
+    const MinimizeResult result {
       pressure,  // pressure
       temperature,  // temperature
       composition,  // composition
@@ -287,6 +303,12 @@ namespace perplexcpp
       sys_props_get_mol_entropy(),  // molar_entropy
       sys_props_get_mol_heat_capacity()  // molar_heat_capacity
     };
+
+    // Add this result to the cache for potential future lookups.
+    if (this->cache.capacity > 0)
+      this->cache.put(result);
+
+    return result;
   }
 
 
@@ -297,8 +319,12 @@ namespace perplexcpp
   }
 
 
+
   // Static variables cannot be instantiated in the header file.
   bool Wrapper::initialized = false;
+  size_t Wrapper::cache_capacity = 0;
+  double Wrapper::cache_rtol = 0.0;
+
 
 
   Wrapper::Wrapper() 
@@ -310,6 +336,7 @@ namespace perplexcpp
     min_pressure(utils::convert_bar_to_pascals(get_min_pressure())),
     max_pressure(utils::convert_bar_to_pascals(get_max_pressure())),
     min_temperature(get_min_temperature()),
-    max_temperature(get_max_temperature())
+    max_temperature(get_max_temperature()),
+    cache(Wrapper::cache_capacity, Wrapper::cache_rtol)
   {}
 }

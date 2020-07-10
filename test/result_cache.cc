@@ -18,7 +18,7 @@
  */
 
 
-#include "result_cache.h"
+#include <perplexcpp/result_cache.h>
 
 #include <gtest/gtest.h>
 

@@ -40,6 +40,12 @@ namespace perplexcpp
       /**
        * ???
        */
+      const size_t capacity;
+
+
+      /**
+       * ???
+       */
       ResultCache(const size_t capacity, const double rtol=0.0);
 
 
@@ -57,6 +63,13 @@ namespace perplexcpp
        */
       void
       put(const MinimizeResult& result);
+
+
+      /**
+       * ???
+       */
+      size_t
+      size();
 
 
     private:

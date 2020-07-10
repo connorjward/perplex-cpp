@@ -18,7 +18,7 @@
  */
 
 
-#include "result_cache.h"
+#include <perplexcpp/result_cache.h>
 
 #include <cassert>
 #include <iostream>
@@ -26,8 +26,15 @@
 namespace perplexcpp
 {
   ResultCache::ResultCache(const size_t capacity, const double rtol)
-    : rtol(rtol), items(capacity)
-  {}
+    : capacity(capacity),
+      rtol(rtol)
+  {
+      if (capacity < 0)
+	throw std::invalid_argument("The capacity must be a non-negative number");
+
+      if (rtol < 0.0 || rtol > 1.0)
+	throw std::invalid_argument("The tolerance must be between 0 and 1");
+  }
 
 
 
@@ -57,8 +64,18 @@ namespace perplexcpp
   ResultCache::put(const MinimizeResult& item)
   {
     // Add the new item to the front of the list and remove the last item.
+    if (items.size() == this->capacity)
+      this->items.pop_back();
+
     this->items.push_front(item);
-    this->items.pop_back();
+  }
+
+
+
+  size_t
+  ResultCache::size()
+  {
+    return this->items.size();
   }
 
 

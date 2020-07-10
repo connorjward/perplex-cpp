@@ -28,6 +28,7 @@
 #include <vector>
 
 #include <perplexcpp/base.h>
+#include <perplexcpp/result_cache.h>
 
 
 namespace perplexcpp
@@ -51,8 +52,9 @@ namespace perplexcpp
        *                     not provided defaults to the current directory.
        */
       static void initialize(const std::string& problem_file, 
-	                     const std::string& working_dir=".");
-
+	                     const std::string& working_dir=".",
+			     const size_t cache_capacity=0, 
+			     const double cache_rtol=0.0);
 
       /**
        * @return The singleton instance of the wrapper.
@@ -149,6 +151,24 @@ namespace perplexcpp
        * Flag indicating whether or not the wrapper has been initialized.
        */
       static bool initialized;
+
+
+      /**
+       * ???
+       */
+      static size_t cache_capacity;
+
+
+      /**
+       * ???
+       */
+      static double cache_rtol;
+
+
+      /**
+       * A LRU cache to store the results of previous computations.
+       */
+      mutable ResultCache cache;
 
 
       /**
