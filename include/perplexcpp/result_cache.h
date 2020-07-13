@@ -52,10 +52,11 @@ namespace perplexcpp
       /**
        * ???
        */
-      const MinimizeResult *const
+      int
       get(const double pressure,
 	  const double temperature,
-	  const std::vector<double>& composition);
+	  const std::vector<double> &composition,
+	  MinimizeResult &out);
 
 
       /**

@@ -26,7 +26,7 @@
 using namespace perplexcpp;
 
 
-TEST(ResultCacheTest, GetReturnsNullPtrWithoutRtol)
+TEST(ResultCacheTest, GetReturnsMinusOneWithoutRtol)
 {
   auto cache = ResultCache(3);
 
@@ -43,14 +43,13 @@ TEST(ResultCacheTest, GetReturnsNullPtrWithoutRtol)
   };
   cache.put(item);
 
-  auto new_item = cache.get(2.1e8, 1788, std::vector<double>(3, 2.1));
-
-  EXPECT_TRUE(new_item == nullptr);
+  MinimizeResult result;
+  EXPECT_EQ(cache.get(2.1e8, 1788, std::vector<double>(3, 2.1), result), -1);
 }
 
 
 
-TEST(ResultCacheTest, GetReturnsNullPtrWithRtol)
+TEST(ResultCacheTest, GetReturnsMinusOneWithRtol)
 {
   auto cache = ResultCache(3, 0.1);
 
@@ -68,9 +67,8 @@ TEST(ResultCacheTest, GetReturnsNullPtrWithRtol)
 
   cache.put(item);
 
-  auto result = cache.get(3.1e8, 1788, std::vector<double>(2, 2.1));
-
-  EXPECT_TRUE(result == nullptr);
+  MinimizeResult result;
+  EXPECT_EQ(cache.get(3.1e8, 1788, std::vector<double>(2, 2.1), result), -1);
 }
 
 
@@ -92,12 +90,11 @@ TEST(ResultCacheTest, GetReturnsExactMatch)
   };
   cache.put(item);
 
-  auto result = cache.get(2.05e8, 1788, std::vector<double>(3, 5.1));
+  MinimizeResult result;
+  ASSERT_EQ(cache.get(2.05e8, 1788, std::vector<double>(3, 5.1), result), 0);
 
-  ASSERT_TRUE(result != nullptr);
-
-  EXPECT_EQ(result->density, 1.2);
-  EXPECT_EQ(result->molar_heat_capacity, 3.0);
+  EXPECT_EQ(result.density, 1.2);
+  EXPECT_EQ(result.molar_heat_capacity, 3.0);
 }
 
 
@@ -116,10 +113,9 @@ TEST(ResultCacheTest, GetReturnsNearMatch)
   };
   cache.put(item);
 
-  auto result = cache.get(2.01e8, 2097, std::vector<double>(4, 7.89));
+  MinimizeResult result;
+  ASSERT_EQ(cache.get(2.01e8, 2097, std::vector<double>(4, 7.89), result), 0);
 
-  ASSERT_TRUE(result != nullptr);
-
-  EXPECT_EQ(result->density, 1.2);
-  EXPECT_EQ(result->molar_heat_capacity, 3.0);
+  EXPECT_EQ(result.density, 1.2);
+  EXPECT_EQ(result.molar_heat_capacity, 3.0);
 }

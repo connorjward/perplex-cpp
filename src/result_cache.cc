@@ -38,10 +38,11 @@ namespace perplexcpp
 
 
 
-  const MinimizeResult *const
+  int
   ResultCache::get(const double pressure, 
 		   const double temperature, 
-		   const std::vector<double>& composition)
+		   const std::vector<double> &composition,
+		   MinimizeResult &out)
   {
     for (auto it = this->items.cbegin(); it != this->items.cend(); ++it)
     {
@@ -49,13 +50,15 @@ namespace perplexcpp
 	  is_near_enough(temperature, (*it).temperature) &&
 	  is_near_enough(composition, (*it).composition))
       {
-	// Reorder the cache and return pointer to the result.
+	// Reorder the cache.
 	this->items.erase(it);
 	this->items.push_front(*it);
-	return &(*it);
+
+	out = *it;
+	return 0;
       }
     }
-    return nullptr;
+    return -1;
   }
 
 

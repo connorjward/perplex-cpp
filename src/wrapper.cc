@@ -269,10 +269,9 @@ namespace perplexcpp
     // Before doing the calculation first check to see if the result is in the cache.
     if (this->cache.capacity > 0)
     {
-      const MinimizeResult *result = this->cache.get(pressure, temperature, composition);
-
-      if (result != nullptr)
-	return *result;
+      MinimizeResult result;
+      if (this->cache.get(pressure, temperature, composition, result) == 0)
+	return result;
     }
 
     for (size_t i = 0; i < n_composition_components; ++i)
