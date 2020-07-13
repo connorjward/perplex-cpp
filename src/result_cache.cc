@@ -50,11 +50,16 @@ namespace perplexcpp
 	  is_near_enough(temperature, (*it).temperature) &&
 	  is_near_enough(composition, (*it).composition))
       {
-	// Reorder the cache.
-	this->items.erase(it);
-	this->items.push_front(*it);
+	MinimizeResult item = *it;
 
-	out = *it;
+	// Reorder the cache if it contains more than one item.
+	if (this->items.size() > 1)
+	{
+	  this->items.erase(it);
+	  this->items.push_front(item);
+	}
+
+	out = item;
 	return 0;
       }
     }

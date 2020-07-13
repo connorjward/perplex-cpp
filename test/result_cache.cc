@@ -119,3 +119,31 @@ TEST(ResultCacheTest, GetReturnsNearMatch)
   EXPECT_EQ(result.density, 1.2);
   EXPECT_EQ(result.molar_heat_capacity, 3.0);
 }
+
+
+
+TEST(ResultCacheTest, GetsWorksTwiceInARow)
+{
+  auto cache = ResultCache(3, 0.1);
+
+  const MinimizeResult item { 
+    2.03e8, 
+    2095, 
+    std::vector<double>(4, 7.93), 
+    23.1,
+    std::vector<Phase>(), 
+    1.2, 1.0, 2.0, 3.0 
+  };
+  cache.put(item);
+
+  MinimizeResult result;
+  ASSERT_EQ(cache.get(2.01e8, 2097, std::vector<double>(4, 7.89), result), 0);
+
+  EXPECT_EQ(result.density, 1.2);
+  EXPECT_EQ(result.molar_heat_capacity, 3.0);
+
+  ASSERT_EQ(cache.get(2.01e8, 2097, std::vector<double>(4, 7.89), result), 0);
+
+  EXPECT_EQ(result.density, 1.2);
+  EXPECT_EQ(result.molar_heat_capacity, 3.0);
+}
