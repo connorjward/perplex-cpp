@@ -90,7 +90,10 @@ namespace perplexcpp
 
 
     /**
-     * The phase composition.
+     * The number of moles of each composition component per mole of phase. 
+     *
+     * @remark To find the amount of each composition component this must be
+     *         scaled by the amount of phase.
      */
     std::vector<double> composition;
   };
