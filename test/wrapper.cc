@@ -234,3 +234,21 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultMolarHeatCapacity)
 {
   EXPECT_NEAR(result.molar_heat_capacity, 6244.7, 0.05);
 }
+
+
+
+TEST_F(WrapperSimpleDataTest, CheckResultCompositionsSumToBulkComposition)
+{
+  auto& perplex_wrapper = Wrapper::get_instance();
+
+  double phase_sum = 0.0;
+  for (size_t p = 0; p < perplex_wrapper.n_phases; p++)
+    for (size_t c = 0; c < perplex_wrapper.n_composition_components; c++)
+      phase_sum += result.phases[p].amount * result.phases[p].composition[c];
+
+  double bulk_sum = 0.0;
+  for (size_t c = 0; c < perplex_wrapper.n_composition_components; c++)
+    bulk_sum += perplex_wrapper.initial_composition[c];
+
+  EXPECT_NEAR(phase_sum, bulk_sum, 1e-8);
+}
