@@ -34,7 +34,6 @@ TEST(ResultCacheTest, GetReturnsMinusOneWithoutRtol)
     2.05e8, 
     1788, 
     std::vector<double>(3, 2.1), 
-    17.2,
     std::vector<Phase>(), 
     1.2, 
     1.0, 
@@ -57,7 +56,6 @@ TEST(ResultCacheTest, GetReturnsMinusOneWithRtol)
     2.05e8, 
     1788, 
     std::vector<double>(2, 2.1), 
-    12.5,
     std::vector<Phase>(), 
     1.2, 
     1.0, 
@@ -81,7 +79,6 @@ TEST(ResultCacheTest, GetReturnsExactMatch)
     2.05e8, 
     1788, 
     std::vector<double>(3, 5.1), 
-    84.3,
     std::vector<Phase>(), 
     1.2, 
     1.0, 
@@ -107,7 +104,6 @@ TEST(ResultCacheTest, GetReturnsNearMatch)
     2.03e8, 
     2095, 
     std::vector<double>(4, 7.93), 
-    23.1,
     std::vector<Phase>(), 
     1.2, 1.0, 2.0, 3.0 
   };
@@ -130,7 +126,6 @@ TEST(ResultCacheTest, GetsWorksTwiceInARow)
     2.03e8, 
     2095, 
     std::vector<double>(4, 7.93), 
-    23.1,
     std::vector<Phase>(), 
     1.2, 1.0, 2.0, 3.0 
   };

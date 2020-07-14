@@ -133,12 +133,6 @@ namespace perplexcpp
 
 
     /**
-     * The total number of moles in the bulk composition.
-     */
-    double n_moles;
-
-
-    /**
      * The resulting phases.
      */
     std::vector<Phase> phases;

@@ -182,15 +182,6 @@ namespace perplexcpp
       }
       return phases;
     }
-
-
-    double get_n_moles()
-    {
-      double n = 0.0;
-      for (size_t i = 0; i < res_phase_props_get_n(); ++i)
-	n += res_phase_props_get_mol(i);
-      return n;
-    }
   }
 
 
@@ -295,7 +286,6 @@ namespace perplexcpp
       pressure,  // pressure
       temperature,  // temperature
       composition,  // composition
-      get_n_moles(),  // n_moles
       get_phases(),  // phases
       sys_props_get_density(),  // density
       sys_props_get_expansivity(),  // expansivity
