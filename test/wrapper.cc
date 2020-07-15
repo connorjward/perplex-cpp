@@ -206,12 +206,21 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseCompositionRatio)
 
   ASSERT_EQ(phases.size(), 4);
 
-  /* EXPECT_NEAR(phases[1].composition_ratio[0], 0.00000, 5e-6); */
   EXPECT_NEAR(phases[1].composition_ratio[1], 0.00000, 5e-6);
-  /* EXPECT_NEAR(phases[2].composition_ratio[1], 1.77645, 5e-6); */
   EXPECT_NEAR(phases[2].composition_ratio[2], 1.77645, 5e-6);
-  /* EXPECT_NEAR(phases[3].composition_ratio[2], 0.17159, 5e-6); */
   EXPECT_NEAR(phases[3].composition_ratio[3], 0.17159, 5e-6);
+}
+
+TEST_F(WrapperSimpleDataTest, CheckMinResultPhaseDensity)
+{
+  auto phases = result.phases;
+
+  ASSERT_EQ(phases.size(), 4);
+
+  EXPECT_NEAR(phases[0].density, 3220.916, 5e-4);
+  EXPECT_NEAR(phases[1].density, 0.0, 1e-8);
+  EXPECT_NEAR(phases[2].density, 3266.898, 5e-4);
+  EXPECT_NEAR(phases[3].density, 3221.036, 5e-4);
 }
 
 

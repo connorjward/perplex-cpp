@@ -104,6 +104,10 @@ namespace perplexcpp
     std::vector<double> composition_ratio;
 
 
+    /**
+     * ???
+     */
+    double density;
   };
 
 

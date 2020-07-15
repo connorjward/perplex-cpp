@@ -376,6 +376,21 @@
         end function
 
 
+
+        function get_endmember_density(endmember_idx) 
+     >  bind(c) result(res)
+          integer(c_size_t), intent(in), value :: endmember_idx
+          real(c_double) :: res
+
+          ! source: olib.f
+          double precision props, psys, psys1, pgeo, pgeo1
+          common / cxt22 / props(i8,k5), psys(i8), psys1(i8),
+     >    pgeo(i8), pgeo1(i8)
+
+          res = props(10, endmember_idx+1)
+        end function
+
+
         ! -----------------------------------------------------------
         ! -------------------- SYSTEM PROPERTIES --------------------
         ! -----------------------------------------------------------

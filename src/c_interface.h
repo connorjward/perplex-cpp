@@ -146,6 +146,13 @@ extern "C"
                                   const size_t component_idx);
         
 
+  /**
+   * ???
+   */
+  double
+  get_endmember_density(const size_t endmember_idx);
+
+
   /* ----------------------------------------------------------- */
   /* ----------------- RESULT PHASE PROPERTIES ----------------- */
   /* ----------------------------------------------------------- */

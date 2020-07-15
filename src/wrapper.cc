@@ -143,6 +143,7 @@ namespace perplexcpp
 	  0.0,  // molar_frac
 	  0.0,  // n_moles  
 	  std::vector<double>(composition_props_get_n_components(), 0.0),  // composition_ratio
+	  0.0,  // density
 	};
 
 	// Check to see if the solution phase is present in the end phases.
@@ -153,6 +154,7 @@ namespace perplexcpp
 	  phase.molar_frac = res_phase_props_get_mol_frac(map[i]);
 	  phase.n_moles = res_phase_props_get_mol(map[i]);
 	  phase.composition_ratio = make_endmember_composition_ratio(map[i]);
+	  phase.density = get_endmember_density(map[i]);
 	}
 
 	phases.push_back(phase);
