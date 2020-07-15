@@ -75,9 +75,15 @@ namespace perplexcpp
 
 
       /**
+       * ???
+       */
+      const std::vector<double> composition_molar_masses;
+
+
+      /**
        * The initial bulk composition.
        */
-      const std::vector<double> initial_composition;
+      const std::vector<double> initial_bulk_composition;
 
 
       /**

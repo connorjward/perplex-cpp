@@ -90,6 +90,12 @@ extern "C"
    */
   char* composition_props_get_name(size_t component_idx);
 
+  /**
+   * @return the molar mass in kg/mol
+   */
+  double 
+  get_composition_molar_mass(const size_t component_idx);
+
   /* ----------------------------------------------------------- */
   /* --------------------- BULK PROPERTIES --------------------- */
   /* ----------------------------------------------------------- */
@@ -132,6 +138,13 @@ extern "C"
    * @return	The full name of the solution phase.
    */
   char* soln_phase_props_get_full_name(size_t idx);
+
+
+
+  double 
+  get_endmember_composition_ratio(const size_t endmember_idx,
+                                  const size_t component_idx);
+        
 
   /* ----------------------------------------------------------- */
   /* ----------------- RESULT PHASE PROPERTIES ----------------- */

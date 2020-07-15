@@ -176,6 +176,8 @@
           res = icomp
         end function
 
+
+
         function composition_props_get_name(component_idx) bind(c) result(res)
           integer(c_size_t), intent(in), value :: component_idx
           type(c_ptr) :: res
@@ -186,6 +188,22 @@
 
           res = alloc_c_str(cname(component_idx+1))
         end function
+
+
+
+        function get_composition_molar_mass(component_idx) bind(c) result(res)
+          integer(c_size_t), intent(in), value :: component_idx
+          real(c_double) :: res
+
+          ! Source: olib.f
+          double precision atwt
+          common / cst45 / atwt(k0)
+
+          ! Convert to kg/mol.
+          res = atwt(component_idx+1) / 1000
+        end function
+
+
 
         ! -----------------------------------------------------------
         ! --------------------- BULK PROPERTIES ---------------------
@@ -198,6 +216,8 @@
           res = cblk(component_idx+1)
         end function
 
+
+        
         subroutine bulk_props_set_composition(component_idx, amount) bind(c)
           integer(c_size_t), intent(in), value :: component_idx
           real(c_double), intent(in), value :: amount
@@ -254,6 +274,8 @@
 
           res = alloc_c_str(lname(soln_phase_idx+1))
         end function
+
+
 
         ! ----------------------------------------------------------
         ! -------------------- PHASE PROPERTIES --------------------
@@ -337,9 +359,12 @@
           res = props(16, res_phase_idx+1)
         end function
 
-        function res_phase_props_get_composition(res_phase_idx, 
-     >      component_idx) bind(c) result(res)
-          integer(c_size_t), intent(in), value :: res_phase_idx
+
+
+        function 
+     >  get_endmember_composition_ratio(endmember_idx, component_idx) 
+     >  bind(c) result(res)
+          integer(c_size_t), intent(in), value :: endmember_idx
           integer(c_size_t), intent(in), value :: component_idx
           real(c_double) :: res
 
@@ -347,8 +372,9 @@
           double precision pcomp
           common / cst324 / pcomp(k0,k5)
 
-          res = pcomp(component_idx+1,res_phase_idx+1)
+          res = pcomp(component_idx+1, endmember_idx+1)
         end function
+
 
         ! -----------------------------------------------------------
         ! -------------------- SYSTEM PROPERTIES --------------------

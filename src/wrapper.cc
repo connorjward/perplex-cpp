@@ -36,30 +36,6 @@ namespace perplexcpp
   namespace
   {
     /**
-     * @return The composition component names.
-     */
-    std::vector<std::string> make_composition_component_names()
-    {
-      std::vector<std::string> names;
-      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
-	names.push_back(std::string(composition_props_get_name(i)));
-      return names;
-    }
-
-
-    /**
-     * @return The bulk composition.
-     */
-    std::vector<double> make_bulk_composition()
-    {
-      std::vector<double> bulk_composition;
-      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
-	bulk_composition.push_back(bulk_props_get_composition(i));
-      return bulk_composition;
-    }
-
-
-    /**
      * @param phase_index The phase index.
      *
      * @return The phase name.
@@ -91,12 +67,12 @@ namespace perplexcpp
      *
      * @return The phase composition.
      */
-    std::vector<double> get_phase_composition(const size_t end_phase_index)
+    std::vector<double> make_endmember_composition_ratio(const size_t endmember_idx)
     {
-      std::vector<double> composition;
-      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
-	composition.push_back(res_phase_props_get_composition(end_phase_index, i));
-      return composition;
+      std::vector<double> comp_ratio;
+      for (size_t c = 0; c < composition_props_get_n_components(); ++c)
+	comp_ratio.push_back(get_endmember_composition_ratio(endmember_idx, c));
+      return comp_ratio;
     }
 
 
@@ -160,22 +136,23 @@ namespace perplexcpp
       auto map = get_phase_index_mapping();
       for (size_t i = 0; i < soln_phase_props_get_n(); ++i) {
 	Phase phase = { 
+	  i,  // id
 	  get_phase_name(i),  // name
 	  0.0,  // weight_frac
-	  0.0,  // vol_frac
-	  0.0,  // mol_frac
-	  0.0,  // amount
-	  std::vector<double>(composition_props_get_n_components(), 0.0)  // composition
+	  0.0,  // volume_frac
+	  0.0,  // molar_frac
+	  0.0,  // n_moles  
+	  std::vector<double>(composition_props_get_n_components(), 0.0),  // composition_ratio
 	};
 
 	// Check to see if the solution phase is present in the end phases.
 	// If they are then load the quantities.
 	if (map.find(i) != map.end()) {
 	  phase.weight_frac = res_phase_props_get_weight_frac(map[i]);
-	  phase.vol_frac = res_phase_props_get_vol_frac(map[i]);
-	  phase.mol_frac = res_phase_props_get_mol_frac(map[i]);
-	  phase.amount = res_phase_props_get_mol(map[i]);
-	  phase.composition = get_phase_composition(map[i]);
+	  phase.volume_frac = res_phase_props_get_vol_frac(map[i]);
+	  phase.molar_frac = res_phase_props_get_mol_frac(map[i]);
+	  phase.n_moles = res_phase_props_get_mol(map[i]);
+	  phase.composition_ratio = make_endmember_composition_ratio(map[i]);
 	}
 
 	phases.push_back(phase);
@@ -304,7 +281,7 @@ namespace perplexcpp
   MinimizeResult
   Wrapper::minimize(const double pressure, const double temperature) const
   {
-    return minimize(pressure, temperature, this->initial_composition);
+    return minimize(pressure, temperature, this->initial_bulk_composition);
   }
 
 
@@ -316,16 +293,55 @@ namespace perplexcpp
 
 
 
+  namespace
+  {
+    std::vector<std::string> make_composition_component_names()
+    {
+      std::vector<std::string> names;
+      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+	names.push_back(std::string(composition_props_get_name(i)));
+      return names;
+    }
+
+
+
+    std::vector<double> 
+    make_composition_molar_masses()
+    {
+      std::vector<double> masses;
+      for (size_t c = 0; c < composition_props_get_n_components(); ++c)
+	masses.push_back(get_composition_molar_mass(c));
+      return masses;
+    }
+
+
+
+    std::vector<double> make_bulk_composition()
+    {
+      std::vector<double> bulk;
+      for (size_t i = 0; i < composition_props_get_n_components(); ++i)
+	bulk.push_back(bulk_props_get_composition(i));
+      return bulk;
+    }
+  }
+
+
+  
   Wrapper::Wrapper() 
   : n_composition_components(composition_props_get_n_components()),
     composition_component_names(make_composition_component_names()),
-    initial_composition(make_bulk_composition()),
+    composition_molar_masses(make_composition_molar_masses()),
+
+    initial_bulk_composition(make_bulk_composition()),
+
     n_phases(soln_phase_props_get_n()),
     phase_names(get_phase_names()),
+
     min_pressure(utils::convert_bar_to_pascals(get_min_pressure())),
     max_pressure(utils::convert_bar_to_pascals(get_max_pressure())),
     min_temperature(get_min_temperature()),
     max_temperature(get_max_temperature()),
+
     cache(Wrapper::cache_capacity, Wrapper::cache_rtol)
   {}
 }

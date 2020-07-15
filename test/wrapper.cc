@@ -68,9 +68,9 @@ TEST_F(WrapperSimpleDataTest, CheckCompositionComponentNames)
 }
 
 
-TEST_F(WrapperSimpleDataTest, CheckInitialComposition)
+TEST_F(WrapperSimpleDataTest, CheckInitialBulkComposition)
 {
-  auto comp = Wrapper::get_instance().initial_composition;
+  auto comp = Wrapper::get_instance().initial_bulk_composition;
 
   ASSERT_EQ(comp.size(), 4);
 
@@ -167,10 +167,10 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseVolumeFractions)
 
   ASSERT_EQ(phases.size(), 4);
 
-  EXPECT_NEAR(phases[0].vol_frac*100, 13.56, 5e-3);
-  EXPECT_NEAR(phases[1].vol_frac*100, 0.00, 5e-3);
-  EXPECT_NEAR(phases[2].vol_frac*100, 61.68, 5e-3);
-  EXPECT_NEAR(phases[3].vol_frac*100, 24.75, 5e-3);
+  EXPECT_NEAR(phases[0].volume_frac*100, 13.56, 5e-3);
+  EXPECT_NEAR(phases[1].volume_frac*100, 0.00, 5e-3);
+  EXPECT_NEAR(phases[2].volume_frac*100, 61.68, 5e-3);
+  EXPECT_NEAR(phases[3].volume_frac*100, 24.75, 5e-3);
 }
 
 
@@ -180,10 +180,10 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseMolarFractions)
 
   ASSERT_EQ(phases.size(), 4);
 
-  EXPECT_NEAR(phases[0].mol_frac*100, 10.36, 5e-3);
-  EXPECT_NEAR(phases[1].mol_frac*100, 0.0, 5e-3);
-  EXPECT_NEAR(phases[2].mol_frac*100, 69.931, 5e-3);
-  EXPECT_NEAR(phases[3].mol_frac*100, 19.70, 5e-3);
+  EXPECT_NEAR(phases[0].molar_frac*100, 10.36, 5e-3);
+  EXPECT_NEAR(phases[1].molar_frac*100, 0.0, 5e-3);
+  EXPECT_NEAR(phases[2].molar_frac*100, 69.931, 5e-3);
+  EXPECT_NEAR(phases[3].molar_frac*100, 19.70, 5e-3);
 }
 
 
@@ -193,22 +193,25 @@ TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseAmounts)
 
   ASSERT_EQ(phases.size(), 4);
 
-  EXPECT_NEAR(phases[0].amount, 3.07, 5e-3);
-  EXPECT_NEAR(phases[1].amount, 0.0, 5e-3);
-  EXPECT_NEAR(phases[2].amount, 20.7, 5e-2);
-  EXPECT_NEAR(phases[3].amount, 5.83, 5e-3);
+  EXPECT_NEAR(phases[0].n_moles, 3.07, 5e-3);
+  EXPECT_NEAR(phases[1].n_moles, 0.0, 5e-3);
+  EXPECT_NEAR(phases[2].n_moles, 20.7, 5e-2);
+  EXPECT_NEAR(phases[3].n_moles, 5.83, 5e-3);
 }
 
 
-TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseCompositions)
+TEST_F(WrapperSimpleDataTest, CheckMinimizeResultPhaseCompositionRatio)
 {
   auto phases = result.phases;
 
   ASSERT_EQ(phases.size(), 4);
 
-  EXPECT_NEAR(phases[1].composition[1], 0.00000, 5e-6);
-  EXPECT_NEAR(phases[2].composition[2], 1.77645, 5e-6);
-  EXPECT_NEAR(phases[3].composition[3], 0.17159, 5e-6);
+  /* EXPECT_NEAR(phases[1].composition_ratio[0], 0.00000, 5e-6); */
+  EXPECT_NEAR(phases[1].composition_ratio[1], 0.00000, 5e-6);
+  /* EXPECT_NEAR(phases[2].composition_ratio[1], 1.77645, 5e-6); */
+  EXPECT_NEAR(phases[2].composition_ratio[2], 1.77645, 5e-6);
+  /* EXPECT_NEAR(phases[3].composition_ratio[2], 0.17159, 5e-6); */
+  EXPECT_NEAR(phases[3].composition_ratio[3], 0.17159, 5e-6);
 }
 
 
@@ -244,11 +247,11 @@ TEST_F(WrapperSimpleDataTest, CheckResultCompositionsSumToBulkComposition)
   double phase_sum = 0.0;
   for (size_t p = 0; p < perplex_wrapper.n_phases; p++)
     for (size_t c = 0; c < perplex_wrapper.n_composition_components; c++)
-      phase_sum += result.phases[p].amount * result.phases[p].composition[c];
+      phase_sum += result.phases[p].n_moles * result.phases[p].composition_ratio[c];
 
   double bulk_sum = 0.0;
   for (size_t c = 0; c < perplex_wrapper.n_composition_components; c++)
-    bulk_sum += perplex_wrapper.initial_composition[c];
+    bulk_sum += perplex_wrapper.initial_bulk_composition[c];
 
   EXPECT_NEAR(phase_sum, bulk_sum, 1e-8);
 }

@@ -67,6 +67,8 @@ TEST_F(InterfaceTest, CheckCompositionProps) {
   EXPECT_STREQ(composition_props_get_name(3), "FeO");
 }
 
+
+
 TEST_F(InterfaceTest, CheckBulkProps) {
   EXPECT_NEAR(bulk_props_get_composition(3), 5.880, 5e-4);
 }
@@ -89,20 +91,20 @@ TEST_F(InterfaceTest, CheckResPhaseProps) {
 
   EXPECT_NEAR(res_phase_props_get_mol(0), 3.07, 5e-2);
 
-  EXPECT_NEAR(res_phase_props_get_composition(0, 0), 2.00000, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(0, 1), 0.74805, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(0, 2), 1.14355, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(0, 3), 0.10840, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(0, 0), 2.00000, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(0, 1), 0.74805, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(0, 2), 1.14355, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(0, 3), 0.10840, 5e-6);
 
-  EXPECT_NEAR(res_phase_props_get_composition(1, 0), 1.00000, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(1, 1), 0.00391, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(1, 2), 1.77645, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(1, 3), 0.21965, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(1, 0), 1.00000, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(1, 1), 0.00391, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(1, 2), 1.77645, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(1, 3), 0.21965, 5e-6);
 
-  EXPECT_NEAR(res_phase_props_get_composition(2, 0), 2.00000, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(2, 1), 0.07617, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(2, 2), 1.75224, 5e-6);
-  EXPECT_NEAR(res_phase_props_get_composition(2, 3), 0.17159, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(2, 0), 2.00000, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(2, 1), 0.07617, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(2, 2), 1.75224, 5e-6);
+  EXPECT_NEAR(get_endmember_composition_ratio(2, 3), 0.17159, 5e-6);
 }
 
 TEST_F(InterfaceTest, CheckSysProps) {
@@ -111,3 +113,13 @@ TEST_F(InterfaceTest, CheckSysProps) {
   EXPECT_NEAR(sys_props_get_mol_entropy(), 11996, 0.5);
   EXPECT_NEAR(sys_props_get_mol_heat_capacity(), 6244.7, 0.05);
 }
+
+
+TEST_F(InterfaceTest, CheckMolarWeights)
+{
+  EXPECT_NEAR(get_composition_molar_mass(0)*1000, 60.084, 5e-4);
+  EXPECT_NEAR(get_composition_molar_mass(1)*1000, 56.077, 5e-4);
+  EXPECT_NEAR(get_composition_molar_mass(2)*1000, 40.304, 5e-4);
+  EXPECT_NEAR(get_composition_molar_mass(3)*1000, 71.844, 5e-4);
+}
+

@@ -60,6 +60,12 @@ namespace perplexcpp
   struct Phase
   {
     /**
+     * Corresponds to the phase index.
+     */
+    size_t id;
+
+
+    /**
      * The phase name.
      */
     PhaseName name;
@@ -74,19 +80,19 @@ namespace perplexcpp
     /**
      * The fractional amount of the phase (by volume).
      */
-    double vol_frac;
+    double volume_frac;
 
 
     /**
      * The fractional amount of the phase (by molar amount).
      */
-    double mol_frac;
+    double molar_frac;
 
 
     /**
      * The amount of the phase (mol).
      */
-    double amount;
+    double n_moles;
 
 
     /**
@@ -95,7 +101,9 @@ namespace perplexcpp
      * @remark To find the amount of each composition component this must be
      *         scaled by the amount of phase.
      */
-    std::vector<double> composition;
+    std::vector<double> composition_ratio;
+
+
   };
 
 
