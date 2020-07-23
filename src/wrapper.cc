@@ -236,6 +236,18 @@ namespace perplexcpp
     if (composition.size() != n_composition_components)
       throw std::invalid_argument("The bulk composition is the wrong size");
 
+    {
+      double sum = 0.0;
+      for (double c : composition)
+      {
+	if (c < 0)
+	  throw std::invalid_argument("The composition must have only non-negative values");
+	sum += c;
+      }
+      if (sum < 1e-8)
+	throw std::invalid_argument("The composition cannot be all zeroes");
+    }
+
     // Before doing the calculation first check to see if the result is in the cache.
     if (this->cache.capacity > 0)
     {
