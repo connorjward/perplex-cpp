@@ -119,11 +119,10 @@ namespace perplexcpp
 	  idx_map.emplace(find_phase_index_from_name(phase_name), i);
 	} 
 	catch (const std::invalid_argument& e) {
-	  std::cerr << e.what() 
-	            << std::endl
+	  std::cerr << e.what() << std::endl
 	            << phase_name << " constitutes " << res_phase_props_get_mol_frac(i)*100
 	            << "\% of the end phases. If this number is large you may need to "
-	            << "edit your Perple_X problem definition file.";
+	            << "edit your Perple_X problem definition file." << std::endl;
 	}
       }
       return idx_map;
