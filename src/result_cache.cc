@@ -89,6 +89,16 @@ namespace perplexcpp
   }
 
 
+
+  void
+  ResultCache::reset_counters()
+  {
+    this->n_hits = 0;
+    this->n_misses = 0;
+  }
+
+
+
   bool 
   ResultCache::is_near_enough(const double x, const double y)
   {

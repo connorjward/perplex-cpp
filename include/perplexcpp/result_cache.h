@@ -73,6 +73,13 @@ namespace perplexcpp
       size();
 
 
+      /**
+       * Reset the hit and miss counters to zero.
+       */
+      void
+      reset_counters();
+
+
       inline unsigned int
       get_n_hits() const { return this->n_hits; }
 
