@@ -92,7 +92,11 @@ namespace perplexcpp
   bool 
   ResultCache::is_near_enough(const double x, const double y)
   {
-    return std::abs(x - y) / x <= this->rtol;
+    // If x is zero then return true if y is negligible.
+    if (x == 0)
+      return y < 1e-8;
+    else
+      return std::abs(x - y) / x <= this->rtol;
   }
 
 
