@@ -60,9 +60,11 @@ namespace perplexcpp
 	}
 
 	out = item;
+	this->n_hits++;
 	return 0;
       }
     }
+    this->n_misses++;
     return -1;
   }
 
@@ -85,7 +87,6 @@ namespace perplexcpp
   {
     return this->items.size();
   }
-
 
 
   bool 

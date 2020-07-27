@@ -145,6 +145,10 @@ namespace perplexcpp
       minimize(const double pressure, const double temperature) const;
 
 
+      inline const ResultCache&
+      get_cache() const { return this->cache; }
+
+
       // Disable copy constructors because the object is a singleton. 
       // These are public to improve error messages.
       // (source: https://stackoverflow.com/questions/1008019/c-singleton-design-pattern)
@@ -172,7 +176,8 @@ namespace perplexcpp
 
 
       /**
-       * A LRU cache to store the results of previous computations.
+       * A LRU cache to store the results of previous computations. It is mutable
+       * so it can be altered inside of a const function.
        */
       mutable ResultCache cache;
 

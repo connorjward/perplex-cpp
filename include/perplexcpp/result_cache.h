@@ -67,11 +67,18 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * @return The size of the cache.
        */
       size_t
       size();
 
+
+      inline unsigned int
+      get_n_hits() const { return this->n_hits; }
+
+
+      inline unsigned int
+      get_n_misses() const { return this->n_misses; }
 
     private:
 
@@ -82,7 +89,20 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * The number of hits.
+       */
+      unsigned int n_hits = 0;
+
+
+      /**
+       * The number of misses.
+       */
+      unsigned int n_misses = 0;
+
+
+      /**
+       * List of the items stored in the cache. A linked list rather than vector is
+       * used for efficient reordering.
        */
       std::list<MinimizeResult> items;
 
