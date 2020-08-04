@@ -1,6 +1,12 @@
 include(GoogleTest)
 
-add_executable(testperplexcpp c_interface.cc result_cache.cc wrapper.cc)
+add_executable(
+  testperplexcpp 
+
+  f2c.cc 
+  result_cache.cc 
+  wrapper.cc
+)
 
 target_include_directories(testperplexcpp PRIVATE ${PROJECT_SOURCE_DIR}/src)
 

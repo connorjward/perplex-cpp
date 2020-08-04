@@ -1,3 +1,4 @@
+# By default disable Perple_X output.
 option(ALLOW_PERPLEX_OUTPUT OFF)
 
 # Set the Fortran compilation flags. '-cpp' is required to enable the 
@@ -8,14 +9,13 @@ set(CMAKE_Fortran_FLAGS
     "${CMAKE_Fortran_FLAGS} -cpp -ffixed-line-length-132 -std=legacy")
 
 add_library(
-  perplexcpp SHARED
-
+  perplexcpp 
+  SHARED
+  f2c.f
   base.cc
-  c_interface.f
   result_cache.cc
   utils.cc 
   wrapper.cc 
-
   ${perplex_SOURCE_DIR}/BLASlib.f
   ${perplex_SOURCE_DIR}/flib.f
   ${perplex_SOURCE_DIR}/nlib.f

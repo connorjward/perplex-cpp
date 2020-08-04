@@ -17,9 +17,13 @@
  * along with PerpleX-cpp.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "c_interface.h"
 
 #include <gtest/gtest.h>
+
+#include "f2c.h"
+
+
+using namespace f2c;
 
 class InterfaceTest : public ::testing::Test {
   protected:
