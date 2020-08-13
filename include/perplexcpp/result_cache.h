@@ -70,7 +70,7 @@ namespace perplexcpp
        * @return The size of the cache.
        */
       size_t
-      size();
+      size() const;
 
 
       /**
@@ -118,7 +118,7 @@ namespace perplexcpp
        * ???
        */
       bool 
-      is_near_enough(const double x, const double y);
+      is_near_enough(const double x, const double y) const;
 
 
       /**
@@ -126,7 +126,7 @@ namespace perplexcpp
        */
       bool 
       is_near_enough(const std::vector<double> xs, 
-                     const std::vector<double> ys);
+                     const std::vector<double> ys) const;
   };
 }
 

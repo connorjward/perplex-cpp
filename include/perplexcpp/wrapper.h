@@ -149,6 +149,10 @@ namespace perplexcpp
       get_cache() const { return this->cache; }
 
 
+      inline ResultCache&
+      get_cache() { return this->cache; }
+
+
       // Disable copy constructors because the object is a singleton. 
       // These are public to improve error messages.
       // (source: https://stackoverflow.com/questions/1008019/c-singleton-design-pattern)

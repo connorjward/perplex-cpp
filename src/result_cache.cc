@@ -23,103 +23,100 @@
 #include <cassert>
 #include <iostream>
 
+
 namespace perplexcpp
 {
-  ResultCache::ResultCache(const size_t capacity, const double rtol)
-    : capacity(capacity),
-      rtol(rtol)
-  {
-      if (capacity < 0)
-	throw std::invalid_argument("The capacity must be a non-negative number");
 
-      if (rtol < 0.0 || rtol > 1.0)
-	throw std::invalid_argument("The tolerance must be between 0 and 1");
-  }
+ResultCache::ResultCache(const size_t capacity, const double rtol)
+  : capacity(capacity),
+    rtol(rtol)
+{
+    if (capacity < 0)
+      throw std::invalid_argument("The capacity must be a non-negative number");
 
-
-
-  int
-  ResultCache::get(const double pressure, 
-		   const double temperature, 
-		   const std::vector<double> &composition,
-		   MinimizeResult &out)
-  {
-    for (auto it = this->items.cbegin(); it != this->items.cend(); ++it)
-    {
-      if (is_near_enough(pressure, (*it).pressure) &&
-	  is_near_enough(temperature, (*it).temperature) &&
-	  is_near_enough(composition, (*it).composition))
-      {
-	MinimizeResult item = *it;
-
-	// Reorder the cache if it contains more than one item.
-	if (this->items.size() > 1)
-	{
-	  this->items.erase(it);
-	  this->items.push_front(item);
-	}
-
-	out = item;
-	this->n_hits++;
-	return 0;
-      }
-    }
-    this->n_misses++;
-    return -1;
-  }
-
-
-
-  void
-  ResultCache::put(const MinimizeResult& item)
-  {
-    // Add the new item to the front of the list and remove the last item.
-    if (items.size() == this->capacity)
-      this->items.pop_back();
-
-    this->items.push_front(item);
-  }
-
-
-
-  size_t
-  ResultCache::size()
-  {
-    return this->items.size();
-  }
-
-
-
-  void
-  ResultCache::reset_counters()
-  {
-    this->n_hits = 0;
-    this->n_misses = 0;
-  }
-
-
-
-  bool 
-  ResultCache::is_near_enough(const double x, const double y)
-  {
-    // If x is zero then return true if y is negligible.
-    if (x == 0)
-      return y < 1e-8;
-    else
-      return std::abs(x - y) / x <= this->rtol;
-  }
-
-
-
-  bool 
-  ResultCache::is_near_enough(const std::vector<double> xs, 
-		              const std::vector<double> ys)
-  {
-    assert(xs.size() == ys.size());
-
-    for (size_t i = 0; i < xs.size(); ++i)
-      if (!is_near_enough(xs[i], ys[i]))
-	return false;
-    return true;
-  }
+    if (rtol < 0.0 || rtol > 1.0)
+      throw std::invalid_argument("The tolerance must be between 0 and 1");
 }
+
+
+int
+ResultCache::get(const double pressure, 
+		 const double temperature, 
+		 const std::vector<double> &composition,
+		 MinimizeResult &out)
+{
+  for (auto it = this->items.cbegin(); it != this->items.cend(); ++it)
+  {
+    if (is_near_enough(pressure, (*it).pressure) &&
+	is_near_enough(temperature, (*it).temperature) &&
+	is_near_enough(composition, (*it).composition))
+    {
+      MinimizeResult item = *it;
+
+      // Reorder the cache if it contains more than one item.
+      if (this->items.size() > 1)
+      {
+	this->items.erase(it);
+	this->items.push_front(item);
+      }
+
+      out = item;
+      this->n_hits++;
+      return 0;
+    }
+  }
+  this->n_misses++;
+  return -1;
+}
+
+
+void
+ResultCache::put(const MinimizeResult& item)
+{
+  // Add the new item to the front of the list and remove the last item.
+  if (items.size() == this->capacity)
+    this->items.pop_back();
+
+  this->items.push_front(item);
+}
+
+
+size_t
+ResultCache::size() const
+{
+  return this->items.size();
+}
+
+
+void
+ResultCache::reset_counters()
+{
+  this->n_hits = 0;
+  this->n_misses = 0;
+}
+
+
+bool 
+ResultCache::is_near_enough(const double x, const double y) const
+{
+  // If x is zero then return true if y is negligible.
+  if (x == 0)
+    return y < 1e-8;
+  else
+    return std::abs(x - y) / x <= this->rtol;
+}
+
+
+bool 
+ResultCache::is_near_enough(const std::vector<double> xs, 
+			    const std::vector<double> ys) const
+{
+  assert(xs.size() == ys.size());
+
+  for (size_t i = 0; i < xs.size(); ++i)
+    if (!is_near_enough(xs[i], ys[i]))
+      return false;
+  return true;
+}
+
+}  // namespace
