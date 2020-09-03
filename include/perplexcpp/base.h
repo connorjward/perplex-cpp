@@ -105,7 +105,7 @@ namespace perplexcpp
 
 
     /**
-     * ???
+     * The density (kg/m3)
      */
     double density;
   };
@@ -113,12 +113,10 @@ namespace perplexcpp
 
 
   /**
-   * @param
-   *
-   * @return
+   * Return the phase that matches the given name. Throws an exception if the name
+   * does not match a known phase.
    */
   Phase find_phase(const std::vector<Phase> phases, const std::string name);
-
 
 
   /**
@@ -171,5 +169,6 @@ namespace perplexcpp
     double molar_heat_capacity;
   };
 }
+
 
 #endif

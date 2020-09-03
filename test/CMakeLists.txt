@@ -15,9 +15,9 @@ target_link_libraries(testperplexcpp perplexcpp
 
 # copy test files to build directory
 file(
-  COPY ${PROJECT_SOURCE_DIR}/data/test
+  COPY ${PROJECT_SOURCE_DIR}/data/simple
   DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data
 )
 
 gtest_discover_tests(testperplexcpp
-                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/test)
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)

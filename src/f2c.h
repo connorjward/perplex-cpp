@@ -143,18 +143,6 @@ char* soln_phase_props_get_full_name(size_t idx);
 
 
 
-double 
-get_endmember_composition_ratio(const size_t endmember_idx,
-				const size_t component_idx);
-      
-
-/**
- * ???
- */
-double
-get_endmember_density(const size_t endmember_idx);
-
-
 /* ----------------------------------------------------------- */
 /* ----------------- RESULT PHASE PROPERTIES ----------------- */
 /* ----------------------------------------------------------- */
@@ -196,13 +184,23 @@ double res_phase_props_get_mol_frac(size_t res_phase_idx);
  */
 double res_phase_props_get_mol(size_t res_phase_idx);
 
-/**
- * @param res_phase_idx Result phase index.
+/*
+ * @param endmember_idx Result phase index.
  * @param component_idx Composition component index.
- * @return              Amount of component in result phase (mol). 
+ * @return              Result phase density
  */
-double res_phase_props_get_composition(size_t res_phase_idx,
-				       size_t component_idx);
+double 
+get_endmember_composition_ratio(const size_t endmember_idx,
+				const size_t component_idx);
+      
+
+/**
+ * @param endmember_idx Result phase index.
+ * @return              Result phase density
+ */
+double
+get_endmember_density(const size_t endmember_idx);
+
 
 /* ----------------------------------------------------------- */
 /* -------------------- SYSTEM PROPERTIES -------------------- */

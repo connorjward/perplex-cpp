@@ -31,26 +31,27 @@
 namespace perplexcpp
 {
   /**
-   * ???
+   * Class that stores the results of minimisations so that they can be referred
+   * to later.
    */
   class ResultCache
   {
     public:
 
       /**
-       * ???
+       * The max number of results that may be saved.
        */
       const size_t capacity;
 
 
       /**
-       * ???
+       * Constructor.
        */
       ResultCache(const size_t capacity, const double rtol=0.0);
 
 
       /**
-       * ???
+       * Try to retrieve an item from the cache. Returns 0 if successful and -1 if not.
        */
       int
       get(const double pressure,
@@ -60,7 +61,7 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * Add an item to the cache.
        */
       void
       put(const MinimizeResult& result);
@@ -90,7 +91,7 @@ namespace perplexcpp
     private:
 
       /**
-       * ???
+       * The cache tolerance.
        */
       const double rtol;
 
@@ -115,14 +116,14 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * Returns true if the two values lie within the prescribed tolerance.
        */
       bool 
       is_near_enough(const double x, const double y) const;
 
 
       /**
-       * ???
+       * Returns true if each value in the two vectors lie within the prescribed tolerance.
        */
       bool 
       is_near_enough(const std::vector<double> xs, 

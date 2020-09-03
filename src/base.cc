@@ -33,6 +33,6 @@ namespace perplexcpp
 	  name == phase.name.full)
 	return phase;
     }
-    throw std::invalid_argument("The name '" + name + "' could not be found.");
+    throw std::invalid_argument("The name '"+name+"' could not be found.");
   }
 }

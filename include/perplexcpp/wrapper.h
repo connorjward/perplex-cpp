@@ -75,7 +75,7 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * The molar masses of the composition components.
        */
       const std::vector<double> composition_molar_masses;
 
@@ -168,13 +168,13 @@ namespace perplexcpp
 
 
       /**
-       * ???
+       * The max number of results stored by the cache.
        */
       static size_t cache_capacity;
 
 
       /**
-       * ???
+       * The cache tolerance.
        */
       static double cache_rtol;
 

@@ -443,9 +443,8 @@
         ! -------------------- PRIVATE FUNCTIONS --------------------
         ! -----------------------------------------------------------
 
+        ! Wrapper for iniprp (resub.f)
         subroutine iniprp_wrapper()
-          ! wrapper for iniprp (resub.f)
-
           ! ----- VARIABLES -----
           ! resub.f : subroutine iniprp
           logical first, err 
