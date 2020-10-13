@@ -1,3 +1,5 @@
+*Note: This repository is now archived and read-only. If you wish to contribute to this project please consider forking it.*
+
 # PerpleX-cpp
 
 This repository contains a C++ wrapper for the thermodynamic code [Perple_X](perplex.ethz.ch) (written in Fortran 77).
